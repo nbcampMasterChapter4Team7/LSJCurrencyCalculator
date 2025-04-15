@@ -30,7 +30,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         
         // UIWindow 세팅
         window = UIWindow(windowScene: windowScene)
-        window?.rootViewController = navigationController
+//        window?.rootViewController = navigationController
+        window?.rootViewController = exchangeRateVC
         window?.makeKeyAndVisible()
     }
 
