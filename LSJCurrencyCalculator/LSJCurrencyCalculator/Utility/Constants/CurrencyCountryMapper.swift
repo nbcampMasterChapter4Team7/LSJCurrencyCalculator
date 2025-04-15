@@ -177,5 +177,4 @@ struct CurrencyCountryMapper {
     static func countryName(for currencyCode: String) -> String {
         return mapping[currencyCode] ?? "알 수 없음"
     }
-
 }

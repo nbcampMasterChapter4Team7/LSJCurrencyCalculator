@@ -11,15 +11,14 @@ import SnapKit
 import Then
 
 
-final class ExchangeRateViewController: UIViewController{
+final class ExchangeRateViewController: UIViewController {
 
     private let viewModel: ExchangeRateViewModel
     private let tableView = ExchangeRateTableView()
     
     private let searchBar = UISearchBar().then {
         $0.placeholder = "통화 검색"
-        $0.backgroundImage = UIImage()
-        // addView를 했을때 위 아래 테두리 없애기위해 사용
+        $0.backgroundImage = UIImage() // 검색바 위/아래 테두리 제거
     }
 
     init(viewModel: ExchangeRateViewModel) {
@@ -36,6 +35,7 @@ final class ExchangeRateViewController: UIViewController{
         bindViewModel()
         setStyles()
         setupLayout()
+        searchBar.delegate = self
         // 데이터를 요청하는 action 전달
         viewModel.action?(.fetchRates(base: "USD"))
     }
@@ -61,16 +61,30 @@ final class ExchangeRateViewController: UIViewController{
             make.leading.trailing.bottom.equalTo(view.safeAreaLayoutGuide)
         }
     }
-    
+
     private func bindViewModel() {
         viewModel.onStateChange = { [weak self] state in
-            if let errorMessage = state.errorMessage {
-                self?.showAlert(message: errorMessage)
-            } else {
+            DispatchQueue.main.async {
+                // 결과가 없으면 backgroundView에 "검색 결과 없음" 표시
+                if state.exchangeRates.isEmpty {
+                    let label = UILabel()
+                    label.text = "검색 결과 없음"
+                    label.textAlignment = .center
+                    label.textColor = .gray
+                    self?.tableView.backgroundView = label
+                } else {
+                    self?.tableView.backgroundView = nil
+                }
                 self?.tableView.reloadData()
+                
+                // 오류가 있을 경우 alert 표시
+                if let errorMessage = state.errorMessage {
+                    self?.showAlert(message: errorMessage)
+                }
             }
         }
     }
+    
 
     
 
@@ -96,4 +110,18 @@ extension ExchangeRateViewController: UITableViewDataSource {
         return cell
     }
 
+}
+
+extension ExchangeRateViewController: UISearchBarDelegate {
+    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+        // 뷰모델에 검색어 전달하여 필터링 실행
+        viewModel.filterRates(with: searchText)
+    }
+    
+    // 검색 취소시 전체 목록 노출 (선택사항)
+    func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
+        searchBar.text = ""
+        viewModel.filterRates(with: "")
+        searchBar.resignFirstResponder()
+    }
 }
