@@ -16,10 +16,7 @@ final class ExchangeRateViewController: UIViewController {
     private let viewModel: ExchangeRateViewModel
     private let tableView = ExchangeRateTableView()
     
-    private let searchBar = UISearchBar().then {
-        $0.placeholder = "통화 검색"
-        $0.backgroundImage = UIImage() // 검색바 위/아래 테두리 제거
-    }
+    private let searchBar = ExchangeRateSearchBar()
 
     init(viewModel: ExchangeRateViewModel) {
         self.viewModel = viewModel
