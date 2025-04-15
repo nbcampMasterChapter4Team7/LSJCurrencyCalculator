@@ -27,11 +27,11 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         
         // UINavigationController 세팅
         let navigationController = UINavigationController(rootViewController: exchangeRateVC)
+        navigationController.navigationBar.prefersLargeTitles = true
         
         // UIWindow 세팅
         window = UIWindow(windowScene: windowScene)
-//        window?.rootViewController = navigationController
-        window?.rootViewController = exchangeRateVC
+        window?.rootViewController = navigationController
         window?.makeKeyAndVisible()
     }
 

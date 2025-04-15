@@ -32,12 +32,16 @@ final class ExchangeRateViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        navigationItem.title = "환율 목록"
+        
+        
         bindViewModel()
         setStyles()
         setupLayout()
         searchBar.delegate = self
         // 데이터를 요청하는 action 전달
         viewModel.action?(.fetchRates(base: "USD"))
+        
     }
 
     
