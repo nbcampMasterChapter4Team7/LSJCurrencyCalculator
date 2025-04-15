@@ -113,7 +113,10 @@ extension ExchangeRateViewController: UITableViewDataSource, UITableViewDelegate
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        self.navigationController?.pushViewController(CaculatorViewController(viewModel: CaculatorViewModel()), animated: true)
+        let selectedRate = viewModel.state.exchangeRates[indexPath.row]
+        let caculatorViewModel = CaculatorViewModel(selectedExchangeRate: selectedRate)
+        let caculatorViewController = CaculatorViewController(viewModel: caculatorViewModel)
+        self.navigationController?.pushViewController(caculatorViewController, animated: true)
     }
 }
 
