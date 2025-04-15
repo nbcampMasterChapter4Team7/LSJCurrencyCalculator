@@ -1,5 +1,5 @@
 //
-//  ExchangeRateCell.swift
+//  ExchangeRateTableViewCell.swift
 //  LSJCurrencyCalculator
 //
 //  Created by yimkeul on 4/15/25.
@@ -11,7 +11,7 @@ import UIKit
 import SnapKit
 import Then
 
-final class ExchangeRateCell: UITableViewCell {
+final class ExchangeRateTableViewCell: UITableViewCell {
 
     static let identifier = "ExchangeRateCell"
 

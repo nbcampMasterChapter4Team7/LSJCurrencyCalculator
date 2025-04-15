@@ -11,10 +11,10 @@ import SnapKit
 import Then
 
 
-final class ExchangeRateViewController: UIViewController, UITableViewDataSource {
+final class ExchangeRateViewController: UIViewController{
 
     private let viewModel: ExchangeRateViewModel
-    private let tableView = UITableView()
+    private let tableView = ExchangeRateTableView()
 
     init(viewModel: ExchangeRateViewModel) {
         self.viewModel = viewModel
@@ -27,18 +27,22 @@ final class ExchangeRateViewController: UIViewController, UITableViewDataSource 
 
     override func viewDidLoad() {
         super.viewDidLoad()
-
-        tableView.dataSource = self
-        view.addSubview(tableView)
-        tableView.frame = view.bounds
-        tableView.register(UITableViewCell.self, forCellReuseIdentifier: "cell")
-
         bindViewModel()
-        
+        setupLayout()
         // 데이터를 요청하는 action 전달
         viewModel.action?(.fetchRates(base: "USD"))
     }
 
+    
+    
+    private func setupLayout() {
+        view.addSubview(tableView)
+        tableView.dataSource = self
+        tableView.snp.makeConstraints { make in
+            make.edges.equalToSuperview()
+        }
+    }
+    
     private func bindViewModel() {
         viewModel.onStateChange = { [weak self] state in
             if let errorMessage = state.errorMessage {
@@ -49,20 +53,28 @@ final class ExchangeRateViewController: UIViewController, UITableViewDataSource 
         }
     }
 
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        viewModel.state.exchangeRates.count
-    }
-
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
-        let rate = viewModel.state.exchangeRates[indexPath.row]
-        cell.textLabel?.text = "\(rate.currency): \(String(format: "%.4f", rate.rate))"
-        return cell
-    }
+    
 
     private func showAlert(message: String) {
         let alert = UIAlertController(title: "오류", message: message, preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "확인", style: .default))
         present(alert, animated: true)
     }
+}
+
+extension ExchangeRateViewController: UITableViewDataSource {
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        viewModel.state.exchangeRates.count
+    }
+    
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        guard let cell = tableView.dequeueReusableCell(withIdentifier: ExchangeRateTableViewCell.identifier, for: indexPath) as? ExchangeRateTableViewCell else {
+            return UITableViewCell()
+        }
+
+        let rate = viewModel.state.exchangeRates[indexPath.row]
+        cell.configure(with: rate.currency, rate: rate.rate)
+        return cell
+    }
+
 }
