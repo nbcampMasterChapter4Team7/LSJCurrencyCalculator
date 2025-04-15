@@ -54,7 +54,8 @@ final class ExchangeRateViewModel: ViewModelProtocol {
             DispatchQueue.main.async {
                 switch result {
                 case .success(let rates):
-                    self?.state.exchangeRates = rates
+                    let sortedRates = rates.sorted { $0.currency < $1.currency }
+                    self?.state.exchangeRates = sortedRates
                     self?.state.errorMessage = nil
                 case .failure:
                     self?.state.exchangeRates = []
