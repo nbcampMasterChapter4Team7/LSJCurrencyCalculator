@@ -34,7 +34,6 @@ final class ExchangeRateViewController: UIViewController {
         super.viewDidLoad()
         navigationItem.title = "환율 목록"
         
-        
         bindViewModel()
         setStyles()
         setupLayout()
@@ -59,6 +58,7 @@ final class ExchangeRateViewController: UIViewController {
         }
         
         tableView.dataSource = self
+        tableView.delegate = self
         tableView.separatorInset = .init(top: 0, left: 16, bottom: 0, right: 16)
         tableView.snp.makeConstraints { make in
             make.top.equalTo(searchBar.snp.bottom)
@@ -99,7 +99,7 @@ final class ExchangeRateViewController: UIViewController {
     }
 }
 
-extension ExchangeRateViewController: UITableViewDataSource {
+extension ExchangeRateViewController: UITableViewDataSource, UITableViewDelegate {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         viewModel.state.exchangeRates.count
     }
@@ -111,9 +111,13 @@ extension ExchangeRateViewController: UITableViewDataSource {
 
         let rate = viewModel.state.exchangeRates[indexPath.row]
         cell.configure(with: rate.currency, rate: rate.rate)
+        cell.selectionStyle = .none
         return cell
     }
-
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        self.navigationController?.pushViewController(CaculatorViewController(viewModel: CaculatorViewModel()), animated: true)
+    }
 }
 
 extension ExchangeRateViewController: UISearchBarDelegate {
