@@ -15,6 +15,8 @@ final class ExchangeRateViewController: UIViewController{
 
     private let viewModel: ExchangeRateViewModel
     private let tableView = ExchangeRateTableView()
+    
+    private let searchBar = UISearchBar()
 
     init(viewModel: ExchangeRateViewModel) {
         self.viewModel = viewModel
@@ -28,18 +30,30 @@ final class ExchangeRateViewController: UIViewController{
     override func viewDidLoad() {
         super.viewDidLoad()
         bindViewModel()
+        setStyles()
         setupLayout()
         // 데이터를 요청하는 action 전달
         viewModel.action?(.fetchRates(base: "USD"))
     }
 
     
+    private func setStyles() {
+        view.backgroundColor = .systemBackground
+    }
+    
     
     private func setupLayout() {
-        view.addSubview(tableView)
+        view.addSubviews(tableView, searchBar)
+        
+        searchBar.snp.makeConstraints { make in
+            make.top.equalTo(view.safeAreaLayoutGuide.snp.top)
+            make.leading.trailing.equalToSuperview()
+        }
+        
         tableView.dataSource = self
         tableView.snp.makeConstraints { make in
-            make.edges.equalToSuperview()
+            make.top.equalTo(searchBar.snp.bottom)
+            make.bottom.leading.trailing.equalTo(view.safeAreaLayoutGuide)
         }
     }
     
