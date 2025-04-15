@@ -7,7 +7,6 @@
 
 import Foundation
 
-// ViewModelProtocol.swift
 protocol ViewModelProtocol {
     associatedtype Action
     associatedtype State

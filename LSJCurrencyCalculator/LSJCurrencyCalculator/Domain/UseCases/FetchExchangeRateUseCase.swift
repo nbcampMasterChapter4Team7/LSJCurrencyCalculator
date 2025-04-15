@@ -6,3 +6,15 @@
 //
 
 import Foundation
+
+final class FetchExchangeRateUseCase {
+    private let repository: ExchangeRateRepositoryProtocol
+
+    init(repository: ExchangeRateRepositoryProtocol) {
+        self.repository = repository
+    }
+
+    func execute(base: String, completion: @escaping (Result<[ExchangeRate], Error>) -> Void) {
+        repository.fetchExchangeRates(base: base, completion: completion)
+    }
+}
