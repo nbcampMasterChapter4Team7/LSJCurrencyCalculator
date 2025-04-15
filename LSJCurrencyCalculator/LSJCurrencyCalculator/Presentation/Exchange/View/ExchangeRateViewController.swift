@@ -16,7 +16,11 @@ final class ExchangeRateViewController: UIViewController{
     private let viewModel: ExchangeRateViewModel
     private let tableView = ExchangeRateTableView()
     
-    private let searchBar = UISearchBar()
+    private let searchBar = UISearchBar().then {
+        $0.placeholder = "통화 검색"
+        $0.backgroundImage = UIImage()
+        // addView를 했을때 위 아래 테두리 없애기위해 사용
+    }
 
     init(viewModel: ExchangeRateViewModel) {
         self.viewModel = viewModel
