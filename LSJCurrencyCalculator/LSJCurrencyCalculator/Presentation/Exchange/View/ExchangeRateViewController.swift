@@ -47,7 +47,7 @@ final class ExchangeRateViewController: UIViewController{
     
     
     private func setupLayout() {
-        view.addSubviews(tableView, searchBar)
+        view.addSubviews(searchBar,tableView)
         
         searchBar.snp.makeConstraints { make in
             make.top.equalTo(view.safeAreaLayoutGuide.snp.top)
@@ -55,9 +55,10 @@ final class ExchangeRateViewController: UIViewController{
         }
         
         tableView.dataSource = self
+        tableView.separatorInset = .init(top: 0, left: 16, bottom: 0, right: 16)
         tableView.snp.makeConstraints { make in
             make.top.equalTo(searchBar.snp.bottom)
-            make.bottom.leading.trailing.equalTo(view.safeAreaLayoutGuide)
+            make.leading.trailing.bottom.equalTo(view.safeAreaLayoutGuide)
         }
     }
     
