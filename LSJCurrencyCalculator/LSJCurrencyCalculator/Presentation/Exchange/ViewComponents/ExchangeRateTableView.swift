@@ -10,7 +10,7 @@ import UIKit
 import SnapKit
 import Then
 
-class ExchangeRateView: UIView {
+final class ExchangeRateView: UIView {
     
 }
 

@@ -14,9 +14,22 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
         guard let windowScene = (scene as? UIWindowScene) else { return }
+        // Data Layer
+        let apiClient = APIClient.shared
+        let repository = ExchangeRateRepository(apiClient: apiClient)
+        
+        // Domain Layer
+        let useCase = FetchExchangeRateUseCase(repository: repository)
+        
+        // Presentation Layer
+        let viewModel = ExchangeRateViewModel(useCase: useCase)
+        let exchangeRateVC = ExchangeRateViewController(viewModel: viewModel)
+        
+        // UINavigationController 세팅
+        let navigationController = UINavigationController(rootViewController: exchangeRateVC)
+        
+        // UIWindow 세팅
         window = UIWindow(windowScene: windowScene)
-        let vc = ExchangeRateViewController()
-        let navigationController = UINavigationController(rootViewController: vc)
         window?.rootViewController = navigationController
         window?.makeKeyAndVisible()
     }
