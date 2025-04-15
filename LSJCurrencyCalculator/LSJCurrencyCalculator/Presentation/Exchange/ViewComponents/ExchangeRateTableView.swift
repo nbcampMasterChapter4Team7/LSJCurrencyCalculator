@@ -24,7 +24,7 @@ final class ExchangeRateTableView: UITableView {
     private func setupTableView() {
         self.register(ExchangeRateTableViewCell.self, forCellReuseIdentifier: ExchangeRateTableViewCell.identifier)
         self.rowHeight = 50
-        self.separatorStyle = .singleLine
+//        self.separatorStyle = .singleLine
     }
 }
 

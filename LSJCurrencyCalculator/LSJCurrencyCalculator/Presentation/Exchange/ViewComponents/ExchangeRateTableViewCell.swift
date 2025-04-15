@@ -50,7 +50,7 @@ final class ExchangeRateTableViewCell: UITableViewCell {
         }
 
         rateLabel.snp.makeConstraints { make in
-            make.trailing.equalToSuperview().inset(16)
+            make.trailing.equalToSuperview().offset(-16)
             make.centerY.equalToSuperview()
         }
     }
