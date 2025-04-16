@@ -14,9 +14,11 @@ import Then
 final class ExchangeRateViewController: UIViewController {
 
     private let viewModel: ExchangeRateViewModel
-    private let tableView = ExchangeRateTableView()
-    
-    private let searchBar = ExchangeRateSearchBar()
+    private let tableView = UITableView()
+    private let searchBar = UISearchBar().then {
+        $0.placeholder = "통화 검색"
+        $0.backgroundImage = UIImage()
+    }
 
     init(viewModel: ExchangeRateViewModel) {
         self.viewModel = viewModel
@@ -30,37 +32,54 @@ final class ExchangeRateViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         navigationItem.title = "환율 목록"
-        
-        bindViewModel()
+
         setStyles()
-        setupLayout()
-        searchBar.delegate = self
+        setLayout()
+        setUIComponents()
+        bindViewModel()
+
         // 데이터를 요청하는 action 전달
         viewModel.action?(.fetchRates(base: "USD"))
-        
+
     }
 
-    
+
     private func setStyles() {
         view.backgroundColor = .systemBackground
     }
-    
-    
-    private func setupLayout() {
-        view.addSubviews(searchBar,tableView)
-        
+
+
+
+    private func setLayout() {
+        view.addSubviews(searchBar, tableView)
+
         searchBar.snp.makeConstraints { make in
             make.top.equalTo(view.safeAreaLayoutGuide.snp.top)
             make.leading.trailing.equalToSuperview()
         }
-        
-        tableView.dataSource = self
-        tableView.delegate = self
-        tableView.separatorInset = .init(top: 0, left: 16, bottom: 0, right: 16)
+
         tableView.snp.makeConstraints { make in
             make.top.equalTo(searchBar.snp.bottom)
             make.leading.trailing.bottom.equalTo(view.safeAreaLayoutGuide)
         }
+    }
+
+
+    private func setUIComponents() {
+        setSearchBar()
+        setTableView()
+    }
+
+    private func setSearchBar() {
+        searchBar.delegate = self
+    }
+
+    private func setTableView() {
+        tableView.dataSource = self
+        tableView.delegate = self
+        tableView.register(ExchangeRateTableViewCell.self, forCellReuseIdentifier: ExchangeRateTableViewCell.identifier)
+        tableView.rowHeight = 60
+        tableView.separatorInset = .init(top: 0, left: 16, bottom: 0, right: 16)
     }
 
     private func bindViewModel() {
@@ -77,7 +96,7 @@ final class ExchangeRateViewController: UIViewController {
                     self?.tableView.backgroundView = nil
                 }
                 self?.tableView.reloadData()
-                
+
                 // 오류가 있을 경우 alert 표시
                 if let errorMessage = state.errorMessage {
                     self?.showAlert(message: errorMessage)
@@ -85,9 +104,6 @@ final class ExchangeRateViewController: UIViewController {
             }
         }
     }
-    
-
-    
 
     private func showAlert(message: String) {
         let alert = UIAlertController(title: "오류", message: message, preferredStyle: .alert)
@@ -100,7 +116,7 @@ extension ExchangeRateViewController: UITableViewDataSource, UITableViewDelegate
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         viewModel.state.exchangeRates.count
     }
-    
+
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: ExchangeRateTableViewCell.identifier, for: indexPath) as? ExchangeRateTableViewCell else {
             return UITableViewCell()
@@ -111,7 +127,7 @@ extension ExchangeRateViewController: UITableViewDataSource, UITableViewDelegate
         cell.selectionStyle = .none
         return cell
     }
-    
+
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let selectedRate = viewModel.state.exchangeRates[indexPath.row]
         let caculatorViewModel = CaculatorViewModel(selectedExchangeRate: selectedRate)
@@ -125,7 +141,7 @@ extension ExchangeRateViewController: UISearchBarDelegate {
         // 뷰모델에 검색어 전달하여 필터링 실행
         viewModel.filterRates(with: searchText)
     }
-    
+
     // 검색 취소시 전체 목록 노출 (선택사항)
     func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
         searchBar.text = ""

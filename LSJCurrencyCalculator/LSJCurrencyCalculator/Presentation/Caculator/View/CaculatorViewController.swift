@@ -64,7 +64,7 @@ final class CaculatorViewController: UIViewController {
         super.viewDidLoad()
         navigationItem.title = "환율 계산기"
         setStyles()
-        setupLayout()
+        setLayout()
         configure()
         bindViewModel()
 
@@ -76,7 +76,7 @@ final class CaculatorViewController: UIViewController {
         view.backgroundColor = .systemBackground
     }
 
-    private func setupLayout() {
+    private func setLayout() {
         labelStackView.addArrangedSubviews(currencyLabel, countryLabel)
         view.addSubviews(labelStackView, amountTextField, convertButton, resultLabel)
 
