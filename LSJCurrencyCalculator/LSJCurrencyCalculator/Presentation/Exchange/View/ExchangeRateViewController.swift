@@ -6,10 +6,8 @@
 //
 
 import UIKit
-
 import SnapKit
 import Then
-
 
 final class ExchangeRateViewController: UIViewController {
 
@@ -17,7 +15,7 @@ final class ExchangeRateViewController: UIViewController {
     private let tableView = UITableView()
     private let searchBar = UISearchBar().then {
         $0.placeholder = "통화 검색"
-        $0.backgroundImage = UIImage()
+        $0.backgroundImage = UIImage() // 검색바 위/아래 테두리 제거
     }
 
     init(viewModel: ExchangeRateViewModel) {
@@ -40,30 +38,23 @@ final class ExchangeRateViewController: UIViewController {
 
         // 데이터를 요청하는 action 전달
         viewModel.action?(.fetchRates(base: "USD"))
-
     }
-
-
+    
     private func setStyles() {
         view.backgroundColor = .systemBackground
     }
 
-
-
     private func setLayout() {
         view.addSubviews(searchBar, tableView)
-
         searchBar.snp.makeConstraints { make in
             make.top.equalTo(view.safeAreaLayoutGuide.snp.top)
             make.leading.trailing.equalToSuperview()
         }
-
         tableView.snp.makeConstraints { make in
             make.top.equalTo(searchBar.snp.bottom)
             make.leading.trailing.bottom.equalTo(view.safeAreaLayoutGuide)
         }
     }
-
 
     private func setUIComponents() {
         setSearchBar()
@@ -85,7 +76,6 @@ final class ExchangeRateViewController: UIViewController {
     private func bindViewModel() {
         viewModel.onStateChange = { [weak self] state in
             DispatchQueue.main.async {
-                // 결과가 없으면 backgroundView에 "검색 결과 없음" 표시
                 if state.exchangeRates.isEmpty {
                     let label = UILabel()
                     label.text = "검색 결과 없음"
@@ -97,7 +87,6 @@ final class ExchangeRateViewController: UIViewController {
                 }
                 self?.tableView.reloadData()
 
-                // 오류가 있을 경우 alert 표시
                 if let errorMessage = state.errorMessage {
                     self?.showAlert(message: errorMessage)
                 }
@@ -118,12 +107,18 @@ extension ExchangeRateViewController: UITableViewDataSource, UITableViewDelegate
     }
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+
         guard let cell = tableView.dequeueReusableCell(withIdentifier: ExchangeRateTableViewCell.identifier, for: indexPath) as? ExchangeRateTableViewCell else {
             return UITableViewCell()
         }
 
         let rate = viewModel.state.exchangeRates[indexPath.row]
-        cell.configure(with: rate.currency, rate: rate.rate)
+        let isFavorite = viewModel.isFavorite(currency: rate.currency)
+        cell.configure(with: rate.currency, rate: rate.rate, isFavorite: isFavorite)
+        
+        cell.favoriteButtonAction = { [weak self] in
+            self?.viewModel.action?(.toggleFavorite(currency: rate.currency))
+        }
         cell.selectionStyle = .none
         return cell
     }
@@ -132,7 +127,7 @@ extension ExchangeRateViewController: UITableViewDataSource, UITableViewDelegate
         let selectedRate = viewModel.state.exchangeRates[indexPath.row]
         let caculatorViewModel = CaculatorViewModel(selectedExchangeRate: selectedRate)
         let caculatorViewController = CaculatorViewController(viewModel: caculatorViewModel)
-        self.navigationController?.pushViewController(caculatorViewController, animated: true)
+        navigationController?.pushViewController(caculatorViewController, animated: true)
     }
 }
 
