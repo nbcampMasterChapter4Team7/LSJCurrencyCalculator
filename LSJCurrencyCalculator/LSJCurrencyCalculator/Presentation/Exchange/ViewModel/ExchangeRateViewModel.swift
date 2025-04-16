@@ -41,8 +41,8 @@ final class ExchangeRateViewModel: ViewModelProtocol {
     private let fetchExchangeRateUseCase: FetchExchangeRateUseCase
     // 즐겨찾기 관련 UseCase (CoreData를 이용한 CRUD 기능을 포함)
     private let manageFavoriteUseCase: ManageFavoriteUseCase
-    
-    init(fetchExchangeRateUseCase: FetchExchangeRateUseCase, manageFavoriteUseCase: ManageFavoriteUseCase ) {
+
+    init(fetchExchangeRateUseCase: FetchExchangeRateUseCase, manageFavoriteUseCase: ManageFavoriteUseCase) {
         self.fetchExchangeRateUseCase = fetchExchangeRateUseCase
         self.manageFavoriteUseCase = manageFavoriteUseCase
 
@@ -67,7 +67,7 @@ final class ExchangeRateViewModel: ViewModelProtocol {
                 case .success(let rates):
                     let sortedRates = rates.sorted { $0.currency < $1.currency }
                     self?.allExchangeRates = sortedRates
-                    self?.state.exchangeRates = sortedRates
+                    self?.state.exchangeRates = self?.applyFavoriteSorting(to: sortedRates) ?? []
                     self?.state.errorMessage = nil
                 case .failure:
                     self?.allExchangeRates = []
@@ -81,21 +81,23 @@ final class ExchangeRateViewModel: ViewModelProtocol {
     // 검색어를 전달받아 환율 데이터를 필터링하는 함수
     func filterRates(with searchText: String) {
         let trimmed = searchText.trimmingCharacters(in: .whitespacesAndNewlines)
+        let filteredRates: [ExchangeRate]
         if trimmed.isEmpty {
             // 검색어가 비어있으면 전체 데이터 노출
-            state.exchangeRates = allExchangeRates
+            filteredRates = allExchangeRates
         } else {
             let uppercasedSearch = trimmed.uppercased()
-            state.exchangeRates = allExchangeRates.filter { rate in
-                // 통화 코드 혹은 국가명(CurrencyCountryMapper를 통한 변환)을 기준으로 필터링
+            filteredRates = allExchangeRates.filter { rate in
                 return rate.currency.contains(uppercasedSearch)
                     || CurrencyCountryMapper.countryName(for: rate.currency).contains(uppercasedSearch)
             }
         }
+        // 필터링 결과에도 즐겨찾기 정렬 적용
+        state.exchangeRates = applyFavoriteSorting(to: filteredRates)
     }
-    
+
     // 즐겨찾기 토글 처리 함수
-    private func toggleFavorite(for currency: String) {
+     private func toggleFavorite(for currency: String) {
         guard let rate = allExchangeRates.first(where: { $0.currency == currency })?.rate else { return }
 
         do {
@@ -107,10 +109,10 @@ final class ExchangeRateViewModel: ViewModelProtocol {
         state.exchangeRates = applyFavoriteSorting(to: allExchangeRates)
     }
 
-    
+
     // 즐겨찾기 상태 반영 정렬 함수:
     // 즐겨찾기된 항목은 상단에 오고, 같은 그룹 내에서는 알파벳 순 정렬
-    private func applyFavoriteSorting(to rates: [ExchangeRate]) -> [ExchangeRate] {
+     private func applyFavoriteSorting(to rates: [ExchangeRate]) -> [ExchangeRate] {
         return rates.sorted { left, right in
             let leftFav = manageFavoriteUseCase.isFavorite(currency: left.currency)
             let rightFav = manageFavoriteUseCase.isFavorite(currency: right.currency)
@@ -120,5 +122,10 @@ final class ExchangeRateViewModel: ViewModelProtocol {
             return left.currency < right.currency
         }
     }
+    
+    func isFavorite(currency: String) -> Bool {
+        return manageFavoriteUseCase.isFavorite(currency: currency)
+    }
+
 }
 
