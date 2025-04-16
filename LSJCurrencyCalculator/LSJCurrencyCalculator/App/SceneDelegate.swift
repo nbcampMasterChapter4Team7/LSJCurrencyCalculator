@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import CoreData
 
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
@@ -14,18 +15,25 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
         guard let windowScene = (scene as? UIWindowScene) else { return }
+        
+        // AppDelegatea 내의 Coredata Container 설정
+        let appDelegate = UIApplication.shared.delegate as! AppDelegate
+        let container = appDelegate.persistentContainer
+        
         // Data Layer
         let apiClient = APIClient.shared
         let repository = ExchangeRateRepository(apiClient: apiClient)
+        let favoriteRepository = CoreDataFavoriteRepository(persistentContainer: container)
         
         // Domain Layer
-        let useCase = FetchExchangeRateUseCase(repository: repository)
+        let fetchExchangeRateUseCase = FetchExchangeRateUseCase(repository: repository)
+        let manageFavoriteUseCase = ManageFavoriteUseCase(repository: favoriteRepository)
         
         // Presentation Layer
-        let viewModel = ExchangeRateViewModel(useCase: useCase)
+        let viewModel = ExchangeRateViewModel(fetchExchangeRateUseCase: fetchExchangeRateUseCase, manageFavoriteUseCase: manageFavoriteUseCase)
         let exchangeRateVC = ExchangeRateViewController(viewModel: viewModel)
         
-        // UINavigationController 세팅
+        // UINavigationController 세팅 (Large title 활성화)
         let navigationController = UINavigationController(rootViewController: exchangeRateVC)
         navigationController.navigationBar.prefersLargeTitles = true
         
@@ -34,6 +42,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         window?.rootViewController = navigationController
         window?.makeKeyAndVisible()
     }
+
 
     func sceneDidDisconnect(_ scene: UIScene) {
         // Called as the scene is being released by the system.
