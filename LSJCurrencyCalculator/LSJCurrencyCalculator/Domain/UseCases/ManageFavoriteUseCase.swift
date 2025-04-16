@@ -29,9 +29,7 @@ final class ManageFavoriteUseCase {
     func updateFavorite(currency: String, isFavorite: Bool) throws {
         try repository.updateFavorite(currency: currency, isFavorite: isFavorite)
     }
-}
-
-extension ManageFavoriteUseCase {
+    
     // 즐겨찾기 여부 확인
     func isFavorite(currency: String) -> Bool {
         let favorites = (try? fetchFavorites()) ?? []
