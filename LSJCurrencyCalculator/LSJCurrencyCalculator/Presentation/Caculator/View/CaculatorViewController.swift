@@ -33,7 +33,7 @@ final class CaculatorViewController: UIViewController {
         $0.borderStyle = .roundedRect
         $0.keyboardType = .decimalPad
         $0.textAlignment = .center
-        $0.placeholder = "금액을 입력하세요"
+        $0.placeholder = "달러(USD)를 입력하세요"
     }
 
     private let convertButton = UIButton().then {
@@ -66,6 +66,10 @@ final class CaculatorViewController: UIViewController {
         setStyles()
         setupLayout()
         configure()
+        bindViewModel()
+
+        // 환율 계산 버튼을 눌렀을 때 행동 처리
+        convertButton.addTarget(self, action: #selector(convertButtonTapped), for: .touchUpInside)
     }
 
     private func setStyles() {
@@ -104,5 +108,31 @@ final class CaculatorViewController: UIViewController {
         let exchangeRate = viewModel.selectedExchangeRate
         currencyLabel.text = exchangeRate.currency
         countryLabel.text = CurrencyCountryMapper.countryName(for: exchangeRate.currency)
+    }
+
+    private func bindViewModel() {
+        viewModel.onStateChange = { [weak self] state in
+            // 상태 업데이트에 따라 결과 출력, 에러가 있으면 Alert 처리
+            DispatchQueue.main.async {
+                if let error = state.errorMessage {
+                    self?.showAlert(message: error)
+                }
+                if let result = state.conversionResult {
+                    self?.resultLabel.text = "$\(state.inputAmount) → \(result) \(state.conversionCurrency)"
+                }
+            }
+        }
+    }
+
+    @objc private func convertButtonTapped() {
+        // 텍스트필드의 값을 가져와 Action 전달
+        guard let input = amountTextField.text else { return }
+        viewModel.action?(.convertCurrency(input))
+    }
+
+    private func showAlert(message: String) {
+        let alert = UIAlertController(title: "오류", message: message, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "확인", style: .default))
+        present(alert, animated: true)
     }
 }
