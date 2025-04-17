@@ -16,7 +16,7 @@ extension FavoriteCurrency {
         return NSFetchRequest<FavoriteCurrency>(entityName: "FavoriteCurrency")
     }
 
-    @NSManaged public var currency: String?
+    @NSManaged public var currencyCode: String?
     @NSManaged public var isFavorite: Bool
 
 }

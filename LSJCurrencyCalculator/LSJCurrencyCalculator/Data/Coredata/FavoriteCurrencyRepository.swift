@@ -22,18 +22,18 @@ final class FavoriteCurrencyRepository: FavoriteCurrencyRepositoryProtocol {
         return try context.fetch(request)
     }
 
-    func addFavorite(currency: String) throws {
+    func addFavorite(currencyCode: String) throws {
         let context = persistentContainer.viewContext
         let favorite = FavoriteCurrency(context: context)
-        favorite.currency = currency
+        favorite.currencyCode = currencyCode
         favorite.isFavorite = true
         try context.save()
     }
 
-    func removeFavorite(currency: String) throws {
+    func removeFavorite(currencyCode: String) throws {
         let context = persistentContainer.viewContext
         let request = FavoriteCurrency.fetchRequest()
-        request.predicate = NSPredicate(format: "currency == %@", currency)
+        request.predicate = NSPredicate(format: "currencyCode == %@", currencyCode)
         let results = try context.fetch(request)
         
         for obj in results {
@@ -42,10 +42,10 @@ final class FavoriteCurrencyRepository: FavoriteCurrencyRepositoryProtocol {
         try context.save()
     }
 
-    func updateFavorite(currency: String, isFavorite: Bool) throws {
+    func updateFavorite(currencyCode: String, isFavorite: Bool) throws {
         let context = persistentContainer.viewContext
         let request = FavoriteCurrency.fetchRequest()
-        request.predicate = NSPredicate(format: "currency == %@", currency)
+        request.predicate = NSPredicate(format: "currencyCode == %@", currencyCode)
         let results = try context.fetch(request)
         
         if let target = results.first {

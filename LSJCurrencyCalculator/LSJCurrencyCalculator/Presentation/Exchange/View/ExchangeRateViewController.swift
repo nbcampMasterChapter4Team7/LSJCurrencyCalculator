@@ -76,7 +76,7 @@ final class ExchangeRateViewController: UIViewController {
     private func bindViewModel() {
         viewModel.onStateChange = { [weak self] state in
             DispatchQueue.main.async {
-                if state.exchangeRates.isEmpty {
+                if state.currencyItems.isEmpty {
                     let label = UILabel()
                     label.text = "검색 결과 없음"
                     label.textAlignment = .center
@@ -103,7 +103,7 @@ final class ExchangeRateViewController: UIViewController {
 
 extension ExchangeRateViewController: UITableViewDataSource, UITableViewDelegate {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        viewModel.state.exchangeRates.count
+        viewModel.state.currencyItems.count
     }
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -112,20 +112,20 @@ extension ExchangeRateViewController: UITableViewDataSource, UITableViewDelegate
             return UITableViewCell()
         }
 
-        let rate = viewModel.state.exchangeRates[indexPath.row]
-        let isFavorite = viewModel.isFavorite(currency: rate.currency)
-        cell.configure(with: rate.currency, rate: rate.rate, isFavorite: isFavorite)
+        let rate = viewModel.state.currencyItems[indexPath.row]
+        let isFavorite = viewModel.isFavorite(currencyCode: rate.currencyCode)
+        cell.configure(with: rate.currencyCode, rate: rate.rate, isFavorite: isFavorite)
         
         cell.favoriteButtonAction = { [weak self] in
-            self?.viewModel.action?(.toggleFavorite(currency: rate.currency))
+            self?.viewModel.action?(.toggleFavorite(currencyCode: rate.currencyCode))
         }
         cell.selectionStyle = .none
         return cell
     }
 
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        let selectedRate = viewModel.state.exchangeRates[indexPath.row]
-        let caculatorViewModel = CaculatorViewModel(selectedExchangeRate: selectedRate)
+        let selectedRate = viewModel.state.currencyItems[indexPath.row]
+        let caculatorViewModel = CaculatorViewModel(selectedCurrencyItem: selectedRate)
         let caculatorViewController = CaculatorViewController(viewModel: caculatorViewModel)
         navigationController?.pushViewController(caculatorViewController, animated: true)
     }

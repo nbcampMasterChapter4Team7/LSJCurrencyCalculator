@@ -105,9 +105,9 @@ final class CaculatorViewController: UIViewController {
     }
 
     private func configure() {
-        let exchangeRate = viewModel.selectedExchangeRate
-        currencyLabel.text = exchangeRate.currency
-        countryLabel.text = CurrencyCountryMapper.countryName(for: exchangeRate.currency)
+        let exchangeRate = viewModel.selectedCurrencyItem
+        currencyLabel.text = exchangeRate.currencyCode
+        countryLabel.text = CurrencyCountryMapper.countryName(for: exchangeRate.currencyCode)
     }
 
     private func bindViewModel() {

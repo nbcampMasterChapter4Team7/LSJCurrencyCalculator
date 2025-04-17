@@ -18,30 +18,30 @@ final class FavoriteCurrencyUseCase {
         return try repository.fetchAllFavorites()
     }
 
-    func addFavorite(currency: String) throws {
-        try repository.addFavorite(currency: currency)
+    func addFavorite(currencyCode: String) throws {
+        try repository.addFavorite(currencyCode: currencyCode)
     }
 
-    func removeFavorite(currency: String) throws {
-        try repository.removeFavorite(currency: currency)
+    func removeFavorite(currencyCode: String) throws {
+        try repository.removeFavorite(currencyCode: currencyCode)
     }
 
-    func updateFavorite(currency: String, isFavorite: Bool) throws {
-        try repository.updateFavorite(currency: currency, isFavorite: isFavorite)
+    func updateFavorite(currencyCode: String, isFavorite: Bool) throws {
+        try repository.updateFavorite(currencyCode: currencyCode, isFavorite: isFavorite)
     }
     
     // 즐겨찾기 여부 확인
-    func isFavorite(currency: String) -> Bool {
+    func isFavorite(currencyCode: String) -> Bool {
         let favorites = (try? fetchFavorites()) ?? []
-        return favorites.contains { $0.currency == currency }
+        return favorites.contains { $0.currencyCode == currencyCode }
     }
     
     // 토글: 이미 즐겨찾기면 삭제, 아니면 추가
-    func toggleFavorite(currency: String) throws {
-        if isFavorite(currency: currency) {
-            try removeFavorite(currency: currency)
+    func toggleFavorite(currencyCode: String) throws {
+        if isFavorite(currencyCode: currencyCode) {
+            try removeFavorite(currencyCode: currencyCode)
         } else {
-            try addFavorite(currency: currency)
+            try addFavorite(currencyCode: currencyCode)
         }
     }
 }

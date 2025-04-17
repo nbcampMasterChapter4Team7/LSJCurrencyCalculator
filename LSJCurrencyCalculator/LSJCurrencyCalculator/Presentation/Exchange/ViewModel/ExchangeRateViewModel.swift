@@ -14,12 +14,12 @@ final class ExchangeRateViewModel: ViewModelProtocol {
     enum Action {
         case fetchRates(base: String)
         case filterRates(searchText: String) // 필터링 액션 추가
-        case toggleFavorite(currency: String)
+        case toggleFavorite(currencyCode: String)
     }
 
     // State 정의: View가 관찰할 상태 값
     struct State {
-        var exchangeRates: [CurrencyItem] = []
+        var currencyItems: [CurrencyItem] = []
         var errorMessage: String?
     }
 
@@ -65,13 +65,13 @@ final class ExchangeRateViewModel: ViewModelProtocol {
             DispatchQueue.main.async {
                 switch result {
                 case .success(let rates):
-                    let sortedRates = rates.sorted { $0.currency < $1.currency }
+                    let sortedRates = rates.sorted { $0.currencyCode < $1.currencyCode }
                     self?.allExchangeRates = sortedRates
-                    self?.state.exchangeRates = self?.applyFavoriteSorting(to: sortedRates) ?? []
+                    self?.state.currencyItems = self?.applyFavoriteSorting(to: sortedRates) ?? []
                     self?.state.errorMessage = nil
                 case .failure:
                     self?.allExchangeRates = []
-                    self?.state.exchangeRates = []
+                    self?.state.currencyItems = []
                     self?.state.errorMessage = "데이터를 불러올 수 없습니다."
                 }
             }
@@ -88,23 +88,23 @@ final class ExchangeRateViewModel: ViewModelProtocol {
         } else {
             let uppercasedSearch = trimmed.uppercased()
             filteredRates = allExchangeRates.filter { rate in
-                return rate.currency.contains(uppercasedSearch)
-                    || CurrencyCountryMapper.countryName(for: rate.currency).contains(uppercasedSearch)
+                return rate.currencyCode.contains(uppercasedSearch)
+                    || CurrencyCountryMapper.countryName(for: rate.currencyCode).contains(uppercasedSearch)
             }
         }
         // 필터링 결과에도 즐겨찾기 정렬 적용
-        state.exchangeRates = applyFavoriteSorting(to: filteredRates)
+        state.currencyItems = applyFavoriteSorting(to: filteredRates)
     }
 
     // 즐겨찾기 토글 처리 함수
-     private func toggleFavorite(for currency: String) {
+     private func toggleFavorite(for currencyCode: String) {
         do {
-            try favoriteCurrencyUseCase.toggleFavorite(currency: currency)
+            try favoriteCurrencyUseCase.toggleFavorite(currencyCode: currencyCode)
         } catch {
             state.errorMessage = "즐겨찾기 변경에 실패했습니다."
         }
         // 즐겨찾기 상태가 변경되었으므로, 전체 데이터를 즐겨찾기 상태에 맞게 재정렬
-        state.exchangeRates = applyFavoriteSorting(to: allExchangeRates)
+        state.currencyItems = applyFavoriteSorting(to: allExchangeRates)
     }
 
 
@@ -112,17 +112,17 @@ final class ExchangeRateViewModel: ViewModelProtocol {
     // 즐겨찾기된 항목은 상단에 오고, 같은 그룹 내에서는 알파벳 순 정렬
      private func applyFavoriteSorting(to rates: [CurrencyItem]) -> [CurrencyItem] {
         return rates.sorted { left, right in
-            let leftFav = favoriteCurrencyUseCase.isFavorite(currency: left.currency)
-            let rightFav = favoriteCurrencyUseCase.isFavorite(currency: right.currency)
+            let leftFav = favoriteCurrencyUseCase.isFavorite(currencyCode: left.currencyCode)
+            let rightFav = favoriteCurrencyUseCase.isFavorite(currencyCode: right.currencyCode)
             if leftFav != rightFav {
                 return leftFav && !rightFav
             }
-            return left.currency < right.currency
+            return left.currencyCode < right.currencyCode
         }
     }
     
-    func isFavorite(currency: String) -> Bool {
-        return favoriteCurrencyUseCase.isFavorite(currency: currency)
+    func isFavorite(currencyCode: String) -> Bool {
+        return favoriteCurrencyUseCase.isFavorite(currencyCode: currencyCode)
     }
 
 }

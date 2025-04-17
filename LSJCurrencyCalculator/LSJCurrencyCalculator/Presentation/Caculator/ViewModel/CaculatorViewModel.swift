@@ -36,11 +36,11 @@ final class CaculatorViewModel: ViewModelProtocol {
     }
     
     // 선택한 환율 정보를 저장합니다.
-    let selectedExchangeRate: CurrencyItem
+    let selectedCurrencyItem: CurrencyItem
 
     // 초기화 시 선택한 환율 정보를 받습니다.
-    init(selectedExchangeRate: CurrencyItem) {
-        self.selectedExchangeRate = selectedExchangeRate
+    init(selectedCurrencyItem: CurrencyItem) {
+        self.selectedCurrencyItem = selectedCurrencyItem
         
         // Action 클로저 구현: 각 액션에 따른 처리
         self.action = { [weak self] action in
@@ -76,14 +76,14 @@ final class CaculatorViewModel: ViewModelProtocol {
         // API 호출 시뮬레이션 (비동기 처리)
         DispatchQueue.global().asyncAfter(deadline: .now() + 0.5) {
             // 계산: 입력 금액 * 선택된 환율의 rate
-            let result = amount * self.selectedExchangeRate.rate
+            let result = amount * self.selectedCurrencyItem.rate
             // 소수점 둘째자리로 반올림
             let rounded = (result * 100).rounded() / 100
             let resultText = String(format: "%.2f", rounded)
             DispatchQueue.main.async {
                 self.state.inputAmount = String(format: "%.2f", amount)
                 self.state.conversionResult = resultText
-                self.state.conversionCurrency = self.selectedExchangeRate.currency
+                self.state.conversionCurrency = self.selectedCurrencyItem.currencyCode
             }
         }
     }

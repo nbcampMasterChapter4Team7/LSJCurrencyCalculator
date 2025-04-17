@@ -16,7 +16,7 @@ extension CachedCurrency {
         return NSFetchRequest<CachedCurrency>(entityName: "CachedCurrency")
     }
 
-    @NSManaged public var currency: String?
+    @NSManaged public var currencyCode: String?
     @NSManaged public var rate: Double
     @NSManaged public var date: Date?
 
