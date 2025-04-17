@@ -8,7 +8,7 @@
 import Foundation
 
 protocol CachedCurrencyRepositoryProtocol {
-    func fetchCachedCurrency(currency: String, date: Date) throws -> [CachedCurrency]
-    func compareCurrency(currency: String) throws -> RateChangeDirection
-    func cachingCurrency(currency: String, rate: Double, date: Date) throws
+    func fetchCachedCurrency(currencyCode: String, date: Date) throws -> CachedCurrency?
+    func compareCurrency(currencyCode: String, newCurrencyItem: CurrencyItem) throws -> RateChangeDirection
+    func cachingCurrency(currencyCode: String, rate: Double, date: Date) throws
 }
