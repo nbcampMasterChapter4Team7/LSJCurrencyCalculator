@@ -22,11 +22,12 @@ final class CaculatorViewController: UIViewController {
 
     private let currencyLabel = UILabel().then {
         $0.font = .systemFont(ofSize: 24, weight: .bold)
+        $0.textColor = .text
     }
 
     private let countryLabel = UILabel().then {
         $0.font = .systemFont(ofSize: 16)
-        $0.textColor = .gray
+        $0.textColor = .secondaryText
     }
 
     private let amountTextField = UITextField().then {
@@ -37,7 +38,7 @@ final class CaculatorViewController: UIViewController {
     }
 
     private let convertButton = UIButton().then {
-        $0.backgroundColor = .systemBlue
+        $0.backgroundColor = .button
         $0.layer.cornerRadius = 8
         $0.setTitleColor(.white, for: .normal)
         $0.titleLabel?.font = .systemFont(ofSize: 16, weight: .medium)
@@ -47,6 +48,7 @@ final class CaculatorViewController: UIViewController {
     private let resultLabel = UILabel().then {
         $0.text = "계산 결과가 여기에 표시됩니다"
         $0.font = .systemFont(ofSize: 20, weight: .medium)
+        $0.textColor = .text
         $0.textAlignment = .center
         $0.numberOfLines = 0
     }
@@ -73,7 +75,7 @@ final class CaculatorViewController: UIViewController {
     }
 
     private func setStyles() {
-        view.backgroundColor = .systemBackground
+        view.backgroundColor = .background
     }
 
     private func setLayout() {

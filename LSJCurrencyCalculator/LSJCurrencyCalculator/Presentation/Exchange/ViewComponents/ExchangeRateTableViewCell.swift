@@ -17,15 +17,17 @@ final class ExchangeRateTableViewCell: UITableViewCell {
 
     private let currencyLabel = UILabel().then {
         $0.font = .systemFont(ofSize: 16, weight: .medium)
+        $0.textColor = .text
     }
 
     private let countryLabel = UILabel().then {
         $0.font = .systemFont(ofSize: 15)
-        $0.textColor = .gray
+        $0.textColor = .secondaryText
     }
 
     private let rateLabel = UILabel().then {
         $0.font = .systemFont(ofSize: 16)
+        $0.textColor = .text
         $0.textAlignment = .right
     }
 
@@ -36,7 +38,7 @@ final class ExchangeRateTableViewCell: UITableViewCell {
 
     private let favoriteButton = UIButton().then {
         $0.setImage(UIImage(systemName: "star"), for: .normal)
-        $0.tintColor = .systemYellow
+        $0.tintColor = .favorite
     }
 
     private let labelStackView = UIStackView().then {
@@ -50,8 +52,13 @@ final class ExchangeRateTableViewCell: UITableViewCell {
 
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
+        setStyle()
         setupLayout()
         favoriteButton.addTarget(self, action: #selector(didTapFavorite), for: .touchUpInside)
+    }
+    
+    private func setStyle() {
+        contentView.backgroundColor = .cellBackground
     }
 
     required init?(coder: NSCoder) {
@@ -97,7 +104,6 @@ final class ExchangeRateTableViewCell: UITableViewCell {
         }
 
         trendLabel.snp.makeConstraints { make in
-//            make.leading.equalTo(rateLabel.snp.trailing).offset(8)
             make.trailing.equalTo(favoriteButton.snp.leading).offset(-8)
             make.centerY.equalToSuperview()
             make.width.equalTo(24)

@@ -41,7 +41,7 @@ final class ExchangeRateViewController: UIViewController {
     }
 
     private func setStyles() {
-        view.backgroundColor = .systemBackground
+        view.backgroundColor = .background
     }
 
     private func setLayout() {
@@ -111,12 +111,6 @@ extension ExchangeRateViewController: UITableViewDataSource, UITableViewDelegate
         guard let cell = tableView.dequeueReusableCell(withIdentifier: ExchangeRateTableViewCell.identifier, for: indexPath) as? ExchangeRateTableViewCell else {
             return UITableViewCell()
         }
-
-//        let rate = viewModel.state.currencyItems[indexPath.row]
-//        let isFavorite = viewModel.isFavorite(currencyCode: rate.currencyCode)
-//        cell.configure(with: rate.currencyCode, rate: rate.rate, isFavorite: isFavorite)
-//
-
 
         let item = viewModel.state.currencyItems[indexPath.row]
         let code = item.currencyItem.currencyCode
