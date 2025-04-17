@@ -19,7 +19,7 @@ final class CurrencyItemRepository: CurrencyItemRepositoryProtocol {
         apiClient.request(Endpoint.fetchExchangeRates(base: base)) { (result: Result<ExchangeRateDTO, Error>) in
             switch result {
             case .success(let dto):
-                let entities = dto.rates.map { CurrencyItem(currencyCode: $0.key, rate: $0.value, change: .none, isFavorite: false) }
+                let entities = dto.rates.map { CurrencyItem(currencyCode: $0.key, rate: $0.value, timeUnix: dto.timeLastUpdateUnix, change: .none, isFavorite: false) }
                 completion(.success(entities))
             case .failure(let error):
                 completion(.failure(error))

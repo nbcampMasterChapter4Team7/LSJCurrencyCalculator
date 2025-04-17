@@ -113,9 +113,9 @@ extension ExchangeRateViewController: UITableViewDataSource, UITableViewDelegate
         }
 
         let item = viewModel.state.currencyItems[indexPath.row]
-        let code = item.currencyItem.currencyCode
-        let rate = item.currencyItem.rate
-        let direction = item.direction
+        let code = item.currencyCode
+        let rate = item.rate
+        let direction = item.change
         let isFavorite = viewModel.isFavorite(currencyCode: code)
         cell.configure(with: code, rate: rate, direction: direction, isFavorite: isFavorite)
         cell.favoriteButtonAction = { [weak self] in
@@ -128,7 +128,7 @@ extension ExchangeRateViewController: UITableViewDataSource, UITableViewDelegate
 
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let selectedRate = viewModel.state.currencyItems[indexPath.row]
-        let caculatorViewModel = CaculatorViewModel(selectedCurrencyItem: selectedRate.currencyItem)
+        let caculatorViewModel = CaculatorViewModel(selectedCurrencyItem: selectedRate)
         let caculatorViewController = CaculatorViewController(viewModel: caculatorViewModel)
         navigationController?.pushViewController(caculatorViewController, animated: true)
     }

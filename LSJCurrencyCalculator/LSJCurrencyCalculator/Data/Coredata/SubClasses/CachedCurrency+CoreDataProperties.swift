@@ -17,8 +17,8 @@ extension CachedCurrency {
     }
 
     @NSManaged public var currencyCode: String?
+    @NSManaged public var timeUnix: Int64
     @NSManaged public var rate: Double
-    @NSManaged public var date: Date?
 
 }
 

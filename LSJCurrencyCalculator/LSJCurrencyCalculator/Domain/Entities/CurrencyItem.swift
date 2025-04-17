@@ -14,6 +14,7 @@ enum RateChangeDirection: String, Codable {
 struct CurrencyItem {
     let currencyCode: String
     let rate: Double
+    var timeUnix: Int
     var change: RateChangeDirection
     var isFavorite: Bool
 }

@@ -16,53 +16,63 @@ final class CachedCurrencyRepository: CachedCurrencyRepositoryProtocol {
         self.persistentContainer = persistentContainer
     }
 
-
-    func fetchCachedCurrency(currencyCode: String, date: Date) throws -> CachedCurrency? {
+    func isNeedCompare(timeUnix: Int) throws -> Bool {
         let context = persistentContainer.viewContext
         let request = CachedCurrency.fetchRequest()
-
-        let calendar = Calendar.current
-        let startOfDay = calendar.startOfDay(for: date)
-        let endOfDay = calendar.date(byAdding: .day, value: 1, to: startOfDay)!
-        request.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
-            NSPredicate(format: "currencyCode == %@", currencyCode),
-            NSPredicate(format: "date >= %@ AND date < %@", startOfDay as NSDate, endOfDay as NSDate)
-            ])
         request.fetchLimit = 1
 
-        return try context.fetch(request).first
+        // 비교 필요
+        guard let firstItem = try context.fetch(request).first else {
+            return true
+        }
 
+        print("isNeedCompare :  \(firstItem.timeUnix) : \(timeUnix) --> \(firstItem.timeUnix != timeUnix)")
+
+        return firstItem.timeUnix != timeUnix
+    }
+
+    func fetchCachedCurrency(currencyCode: String) throws -> CachedCurrency? {
+        let context = persistentContainer.viewContext
+        let request = CachedCurrency.fetchRequest()
+        request.predicate = NSPredicate(format: "currencyCode == %@", currencyCode)
+        let result = try context.fetch(request)
+
+        if let target = result.first {
+            print("fectch Cache : \(target.currencyCode ?? "") - \(target.rate) - \(target.timeUnix)")
+            return target
+        }
+        print("no fetch cache data")
+        return nil
     }
 
     func compareCurrency(currencyCode: String, newCurrencyItem: CurrencyItem) throws -> RateChangeDirection {
-        guard let yesterday = Calendar.current.date(byAdding: .day, value: -1, to: Date()),
-            let previousCurrencyItem = try fetchCachedCurrency(currencyCode: currencyCode, date: yesterday) else {
+
+        guard let cachedCurrencyItem = try fetchCachedCurrency(currencyCode: currencyCode) else {
             return .none
         }
 
-        if abs(newCurrencyItem.rate - previousCurrencyItem.rate) > 0.01 {
-            return newCurrencyItem.rate > previousCurrencyItem.rate ? .up : .down
+        if abs(newCurrencyItem.rate - cachedCurrencyItem.rate) > 0.01 {
+            return newCurrencyItem.rate > cachedCurrencyItem.rate ? .up : .down
         } else {
             return .none
         }
     }
 
-    func cachingCurrency(currencyCode: String, rate: Double, date: Date) throws {
+    func saveCurrency(currencyCode: String, rate: Double, timeUnix: Int) throws {
         let context = persistentContainer.viewContext
-        let startOfDay = Calendar.current.startOfDay(for: date)
         let request = CachedCurrency.fetchRequest()
-        request.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
-            NSPredicate(format: "currencyCode == %@", currencyCode),
-            NSPredicate(format: "date == %@", startOfDay as NSDate)
-        ])
-        let results = try context.fetch(request)
-        
-        if let target = results.first {
-            target.date = startOfDay
-            target.rate = rate
-            try context.save()
+        request.predicate = NSPredicate(format: "currencyCode == %@", currencyCode)
+        let existing = try context.fetch(request).first
+
+        let entity: CachedCurrency
+        if let e = existing {
+            entity = e
+        } else {
+            entity = CachedCurrency(context: context)
+            entity.currencyCode = currencyCode
         }
+        entity.rate = rate
+        entity.timeUnix = Int64(timeUnix)
+        try context.save()
     }
-
-
 }

@@ -77,19 +77,19 @@ import Foundation
 //                        } catch {
 //                            direction = .none
 //                        }
-//                        
+//
 //                        do {
 //                            try self?.cachedCurrencyUseCase.cachingCurrency(currencyCode: rate.currencyCode, rate: rate.rate, date: Date())
 //                        } catch {
-//                            
+//
 //                        }
 ////                        items.append(CurrencyItem(currencyCode: rate.currencyCode, rate: rate.rate, change: direction, isFavorite: <#T##Bool#>))
 //                    }
-//                    
-//                    
-//                    
-//                    
-//                    
+//
+//
+//
+//
+//
 //                    self?.allExchangeRates = sortedRates
 //                    self?.state.currencyItems = self?.applyFavoriteSorting(to: sortedRates) ?? []
 //                    self?.state.errorMessage = nil
@@ -144,7 +144,7 @@ import Foundation
 //            return left.currencyCode < right.currencyCode
 //        }
 //    }
-//    
+//
 //    func isFavorite(currencyCode: String) -> Bool {
 //        return favoriteCurrencyUseCase.isFavorite(currencyCode: currencyCode)
 //    }
@@ -160,13 +160,13 @@ final class ExchangeRateViewModel: ViewModelProtocol {
     }
 
     // 화면에 표시할 모델
-    struct DisplayItem {
-        let currencyItem: CurrencyItem
-        let direction: RateChangeDirection
-    }
+//    struct DisplayItem {
+//        let currencyItem: CurrencyItem
+//        let direction: RateChangeDirection
+//    }
 
     struct State {
-        var currencyItems: [DisplayItem] = []
+        var currencyItems: [CurrencyItem] = []
         var errorMessage: String?
     }
 
@@ -178,7 +178,7 @@ final class ExchangeRateViewModel: ViewModelProtocol {
     }
 
     // 전체 데이터 보관(필터링 및 재정렬 위해)
-    private var allDisplayItems: [DisplayItem] = []
+    private var allDisplayItems: [CurrencyItem] = []
 
     private let currencyItemUseCase: CurrencyItemUseCase
     private let favoriteCurrencyUseCase: FavoriteCurrencyUseCase
@@ -212,35 +212,45 @@ final class ExchangeRateViewModel: ViewModelProtocol {
                 guard let self = self else { return }
                 switch result {
                 case .success(let rates):
-                    let sorted = rates.sorted { $0.currencyCode < $1.currencyCode }
-                    var items: [DisplayItem] = []
-                    for r in sorted {
-                        // 이전 데이터와 비교
-                        let dir: RateChangeDirection
-                        do {
-                            dir = try self.cachedCurrencyUseCase.compareCurrency(
-                                currencyCode: r.currencyCode,
-                                newCurrencyItem: r
-                            )
-                        } catch {
-                            dir = .none
-                        }
-                        // 새로운 데이터 캐싱
-                        do {
-                            try self.cachedCurrencyUseCase.cachingCurrency(
-                                currencyCode: r.currencyCode,
-                                rate: r.rate,
-                                date: Date()
-                            )
-                        } catch {
-                            // 캐싱 실패 무시 or 로깅
-                        }
-                        items.append(DisplayItem(currencyItem: r, direction: dir))
+                    let sortedRates = rates.sorted { $0.currencyCode < $1.currencyCode }
+                    var items: [CurrencyItem] = []
+                    guard let firstItem = sortedRates.first else {
+                        NSLog("TT : firstItem 없음")
+                        return
                     }
-                    self.allDisplayItems = items
-                    self.state.currencyItems = self.applyFavoriteSorting(to: items)
-                    self.state.errorMessage = nil
-
+                    do {
+                        if try self.cachedCurrencyUseCase.isNeedCompare(timeUnix: firstItem.timeUnix) {
+                            // 서로 timeUTC가 다른경우에는 비교하기
+                            // 끝나고 데이터 저장.
+                            for rate in sortedRates {
+                                let dir: RateChangeDirection
+                                do {
+                                    dir = try self.cachedCurrencyUseCase.compareCurrency(currencyCode: rate.currencyCode, newCurrencyItem: rate)
+                                } catch {
+                                    dir = .none
+                                }
+                                
+                                do {
+                                    try self.cachedCurrencyUseCase.saveCurrency(currencyCode: rate.currencyCode, rate: rate.rate, timeUnix: firstItem.timeUnix)
+                                } catch {
+                                    // 저장 실패
+                                    print("저장 실패")
+                                }
+                                items.append(CurrencyItem(currencyCode: rate.currencyCode, rate: rate.rate, timeUnix: firstItem.timeUnix, change: dir, isFavorite: false))
+                            }
+                            
+                        } else {
+                            items = sortedRates
+                        }
+                        self.allDisplayItems = items
+                        self.state.currencyItems = self.applyFavoriteSorting(to: items)
+                        self.state.errorMessage = nil
+                    } catch {
+                        print("비교 실패")
+                        self.allDisplayItems = []
+                        self.state.currencyItems = []
+                        self.state.errorMessage = "데이터를 불러올 수 없습니다."
+                    }
                 case .failure:
                     self.allDisplayItems = []
                     self.state.currencyItems = []
@@ -252,13 +262,13 @@ final class ExchangeRateViewModel: ViewModelProtocol {
 
     func filterRates(with searchText: String) {
         let trim = searchText.trimmingCharacters(in: .whitespacesAndNewlines)
-        let filtered: [DisplayItem]
+        let filtered: [CurrencyItem]
         if trim.isEmpty {
             filtered = allDisplayItems
         } else {
             let up = trim.uppercased()
             filtered = allDisplayItems.filter { item in
-                let code = item.currencyItem.currencyCode
+                let code = item.currencyCode
                 let country = CurrencyCountryMapper.countryName(for: code)
                 return code.contains(up) || country.contains(up)
             }
@@ -276,14 +286,14 @@ final class ExchangeRateViewModel: ViewModelProtocol {
         state.currencyItems = applyFavoriteSorting(to: allDisplayItems)
     }
 
-    private func applyFavoriteSorting(to items: [DisplayItem]) -> [DisplayItem] {
+    private func applyFavoriteSorting(to items: [CurrencyItem]) -> [CurrencyItem] {
         return items.sorted { a, b in
-            let aFav = favoriteCurrencyUseCase.isFavorite(currencyCode: a.currencyItem.currencyCode)
-            let bFav = favoriteCurrencyUseCase.isFavorite(currencyCode: b.currencyItem.currencyCode)
+            let aFav = favoriteCurrencyUseCase.isFavorite(currencyCode: a.currencyCode)
+            let bFav = favoriteCurrencyUseCase.isFavorite(currencyCode: b.currencyCode)
             if aFav != bFav {
                 return aFav
             }
-            return a.currencyItem.currencyCode < b.currencyItem.currencyCode
+            return a.currencyCode < b.currencyCode
         }
     }
 
