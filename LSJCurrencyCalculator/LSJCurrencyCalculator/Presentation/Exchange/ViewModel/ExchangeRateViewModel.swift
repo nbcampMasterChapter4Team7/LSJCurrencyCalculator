@@ -19,7 +19,7 @@ final class ExchangeRateViewModel: ViewModelProtocol {
 
     // State 정의: View가 관찰할 상태 값
     struct State {
-        var exchangeRates: [ExchangeRate] = []
+        var exchangeRates: [CurrencyItem] = []
         var errorMessage: String?
     }
 
@@ -35,14 +35,14 @@ final class ExchangeRateViewModel: ViewModelProtocol {
     }
 
     // 전체 데이터를 보관하기 위한 프로퍼티 (필터링 용)
-    private var allExchangeRates: [ExchangeRate] = []
+    private var allExchangeRates: [CurrencyItem] = []
 
     // UseCase 의존성
-    private let fetchExchangeRateUseCase: FetchExchangeRateUseCase
+    private let fetchExchangeRateUseCase: CurrencyItemUseCase
     // 즐겨찾기 관련 UseCase (CoreData를 이용한 CRUD 기능을 포함)
-    private let manageFavoriteUseCase: ManageFavoriteUseCase
+    private let manageFavoriteUseCase: FavoriteCurrencyUseCase
 
-    init(fetchExchangeRateUseCase: FetchExchangeRateUseCase, manageFavoriteUseCase: ManageFavoriteUseCase) {
+    init(fetchExchangeRateUseCase: CurrencyItemUseCase, manageFavoriteUseCase: FavoriteCurrencyUseCase) {
         self.fetchExchangeRateUseCase = fetchExchangeRateUseCase
         self.manageFavoriteUseCase = manageFavoriteUseCase
 
@@ -81,7 +81,7 @@ final class ExchangeRateViewModel: ViewModelProtocol {
     // 검색어를 전달받아 환율 데이터를 필터링하는 함수
     func filterRates(with searchText: String) {
         let trimmed = searchText.trimmingCharacters(in: .whitespacesAndNewlines)
-        let filteredRates: [ExchangeRate]
+        let filteredRates: [CurrencyItem]
         if trimmed.isEmpty {
             // 검색어가 비어있으면 전체 데이터 노출
             filteredRates = allExchangeRates
@@ -112,7 +112,7 @@ final class ExchangeRateViewModel: ViewModelProtocol {
 
     // 즐겨찾기 상태 반영 정렬 함수:
     // 즐겨찾기된 항목은 상단에 오고, 같은 그룹 내에서는 알파벳 순 정렬
-     private func applyFavoriteSorting(to rates: [ExchangeRate]) -> [ExchangeRate] {
+     private func applyFavoriteSorting(to rates: [CurrencyItem]) -> [CurrencyItem] {
         return rates.sorted { left, right in
             let leftFav = manageFavoriteUseCase.isFavorite(currency: left.currency)
             let rightFav = manageFavoriteUseCase.isFavorite(currency: right.currency)

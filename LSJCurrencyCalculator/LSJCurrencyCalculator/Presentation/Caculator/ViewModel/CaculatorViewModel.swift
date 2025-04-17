@@ -36,10 +36,10 @@ final class CaculatorViewModel: ViewModelProtocol {
     }
     
     // 선택한 환율 정보를 저장합니다.
-    let selectedExchangeRate: ExchangeRate
+    let selectedExchangeRate: CurrencyItem
 
     // 초기화 시 선택한 환율 정보를 받습니다.
-    init(selectedExchangeRate: ExchangeRate) {
+    init(selectedExchangeRate: CurrencyItem) {
         self.selectedExchangeRate = selectedExchangeRate
         
         // Action 클로저 구현: 각 액션에 따른 처리

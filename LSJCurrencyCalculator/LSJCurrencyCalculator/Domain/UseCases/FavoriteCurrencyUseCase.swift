@@ -1,5 +1,5 @@
 //
-//  ManageFavoriteUseCase.swift
+//  FavoriteCurrencyUseCase.swift
 //  LSJCurrencyCalculator
 //
 //  Created by yimkeul on 4/16/25.
@@ -7,14 +7,14 @@
 
 import Foundation
 
-final class ManageFavoriteUseCase {
-    private let repository: FavoriteRepositoryProtocol
+final class FavoriteCurrencyUseCase {
+    private let repository: FavoriteCurrencyRapositoryProtocol
 
-    init(repository: FavoriteRepositoryProtocol) {
+    init(repository: FavoriteCurrencyRapositoryProtocol) {
         self.repository = repository
     }
     
-    func fetchFavorites() throws -> [Favorite] {
+    func fetchFavorites() throws -> [FavoriteCurrency] {
         return try repository.fetchAllFavorites()
     }
 

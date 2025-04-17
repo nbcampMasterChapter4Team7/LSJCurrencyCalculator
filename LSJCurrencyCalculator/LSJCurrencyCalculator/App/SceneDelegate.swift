@@ -22,12 +22,12 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         
         // Data Layer
         let apiClient = APIClient.shared
-        let repository = ExchangeRateRepository(apiClient: apiClient)
-        let favoriteRepository = CoreDataFavoriteRepository(persistentContainer: container)
+        let repository = CurrencyItemRepository(apiClient: apiClient)
+        let favoriteCurrencyRepository = FavoriteCurrencyRepository(persistentContainer: container)
         
         // Domain Layer
-        let fetchExchangeRateUseCase = FetchExchangeRateUseCase(repository: repository)
-        let manageFavoriteUseCase = ManageFavoriteUseCase(repository: favoriteRepository)
+        let fetchExchangeRateUseCase = CurrencyItemUseCase(repository: repository)
+        let manageFavoriteUseCase = FavoriteCurrencyUseCase(repository: favoriteCurrencyRepository)
         
         // Presentation Layer
         let viewModel = ExchangeRateViewModel(fetchExchangeRateUseCase: fetchExchangeRateUseCase, manageFavoriteUseCase: manageFavoriteUseCase)
