@@ -39,7 +39,7 @@ final class ExchangeRateViewController: UIViewController {
         // 데이터를 요청하는 action 전달
         viewModel.action?(.fetchRates(base: "USD"))
     }
-    
+
     private func setStyles() {
         view.backgroundColor = .systemBackground
     }
@@ -112,20 +112,29 @@ extension ExchangeRateViewController: UITableViewDataSource, UITableViewDelegate
             return UITableViewCell()
         }
 
-        let rate = viewModel.state.currencyItems[indexPath.row]
-        let isFavorite = viewModel.isFavorite(currencyCode: rate.currencyCode)
-        cell.configure(with: rate.currencyCode, rate: rate.rate, isFavorite: isFavorite)
-        
+//        let rate = viewModel.state.currencyItems[indexPath.row]
+//        let isFavorite = viewModel.isFavorite(currencyCode: rate.currencyCode)
+//        cell.configure(with: rate.currencyCode, rate: rate.rate, isFavorite: isFavorite)
+//
+
+
+        let item = viewModel.state.currencyItems[indexPath.row]
+        let code = item.currencyItem.currencyCode
+        let rate = item.currencyItem.rate
+        let direction = item.direction
+        let isFavorite = viewModel.isFavorite(currencyCode: code)
+        cell.configure(with: code, rate: rate, direction: direction, isFavorite: isFavorite)
         cell.favoriteButtonAction = { [weak self] in
-            self?.viewModel.action?(.toggleFavorite(currencyCode: rate.currencyCode))
+            self?.viewModel.action?(.toggleFavorite(currencyCode: code))
         }
+
         cell.selectionStyle = .none
         return cell
     }
 
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let selectedRate = viewModel.state.currencyItems[indexPath.row]
-        let caculatorViewModel = CaculatorViewModel(selectedCurrencyItem: selectedRate)
+        let caculatorViewModel = CaculatorViewModel(selectedCurrencyItem: selectedRate.currencyItem)
         let caculatorViewController = CaculatorViewController(viewModel: caculatorViewModel)
         navigationController?.pushViewController(caculatorViewController, animated: true)
     }

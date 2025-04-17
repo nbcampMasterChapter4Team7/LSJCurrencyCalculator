@@ -29,6 +29,11 @@ final class ExchangeRateTableViewCell: UITableViewCell {
         $0.textAlignment = .right
     }
 
+    private let trendLabel = UILabel().then {
+        $0.font = .systemFont(ofSize: 16)
+        $0.textAlignment = .center
+    }
+
     private let favoriteButton = UIButton().then {
         $0.setImage(UIImage(systemName: "star"), for: .normal)
         $0.tintColor = .systemYellow
@@ -58,21 +63,44 @@ final class ExchangeRateTableViewCell: UITableViewCell {
     }
 
     // 즐겨찾기 상태에 따라 버튼 이미지 업데이트
-    func configure(with currency: String, rate: Double, isFavorite: Bool) {
+    func configure(with currency: String, rate: Double, direction: RateChangeDirection, isFavorite: Bool) {
         currencyLabel.text = currency
         countryLabel.text = CurrencyCountryMapper.countryName(for: currency)
         rateLabel.text = String(format: "%.4f", rate)
+        switch direction {
+        case .up:
+            trendLabel.text = "🔼"
+        case .down:
+            trendLabel.text = "🔽"
+        case .none:
+            trendLabel.text = "―"
+        }
         let imageName = isFavorite ? "star.fill" : "star"
         favoriteButton.setImage(UIImage(systemName: imageName), for: .normal)
     }
 
     private func setupLayout() {
         labelStackView.addArrangedSubviews(currencyLabel, countryLabel)
-        contentView.addSubviews(labelStackView, rateLabel, favoriteButton)
+        contentView.addSubviews(labelStackView, rateLabel, trendLabel, favoriteButton)
 
         labelStackView.snp.makeConstraints { make in
             make.leading.equalToSuperview().offset(16)
             make.centerY.equalToSuperview()
+        }
+
+
+        rateLabel.snp.makeConstraints { make in
+            make.trailing.equalTo(trendLabel.snp.leading).offset(-8)
+            make.centerY.equalToSuperview()
+            make.leading.greaterThanOrEqualTo(labelStackView.snp.trailing).offset(16)
+            make.width.equalTo(120)
+        }
+
+        trendLabel.snp.makeConstraints { make in
+//            make.leading.equalTo(rateLabel.snp.trailing).offset(8)
+            make.trailing.equalTo(favoriteButton.snp.leading).offset(-8)
+            make.centerY.equalToSuperview()
+            make.width.equalTo(24)
         }
 
         favoriteButton.snp.makeConstraints { make in
@@ -81,11 +109,5 @@ final class ExchangeRateTableViewCell: UITableViewCell {
             make.width.height.equalTo(24)
         }
 
-        rateLabel.snp.makeConstraints { make in
-            make.trailing.equalTo(favoriteButton.snp.leading).offset(-8)
-            make.centerY.equalToSuperview()
-            make.leading.greaterThanOrEqualTo(labelStackView.snp.trailing).offset(16)
-            make.width.equalTo(120)
-        }
     }
 }
