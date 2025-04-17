@@ -1,5 +1,5 @@
 //
-//  CoreDataFavoriteRepository.swift
+//  FavoriteCurrencyRepository.swift
 //  LSJCurrencyCalculator
 //
 //  Created by yimkeul on 4/16/25.
@@ -8,7 +8,7 @@
 import CoreData
 import Foundation
 
-final class CoreDataFavoriteRepository: FavoriteRepositoryProtocol {
+final class FavoriteCurrencyRepository: FavoriteCurrencyRapositoryProtocol {
     
     private let persistentContainer: NSPersistentContainer
     
@@ -16,16 +16,15 @@ final class CoreDataFavoriteRepository: FavoriteRepositoryProtocol {
         self.persistentContainer = persistentContainer
     }
 
-    func fetchAllFavorites() throws -> [Favorite] {
+    func fetchAllFavorites() throws -> [FavoriteCurrency] {
         let context = persistentContainer.viewContext
-        let request = Favorite.fetchRequest() // NSFetchRequest<Favorite>
+        let request = FavoriteCurrency.fetchRequest() // NSFetchRequest<FavoriteCurrency>
         return try context.fetch(request)
     }
 
     func addFavorite(currency: String, rate: Double) throws {
         let context = persistentContainer.viewContext
-        let favorite = Favorite(context: context)
-        favorite.uuid = UUID()
+        let favorite = FavoriteCurrency(context: context)
         favorite.currency = currency
         favorite.rate = rate
         favorite.isFavorite = true
@@ -34,7 +33,7 @@ final class CoreDataFavoriteRepository: FavoriteRepositoryProtocol {
 
     func removeFavorite(currency: String) throws {
         let context = persistentContainer.viewContext
-        let request = Favorite.fetchRequest()
+        let request = FavoriteCurrency.fetchRequest()
         request.predicate = NSPredicate(format: "currency == %@", currency)
         let results = try context.fetch(request)
         
@@ -46,7 +45,7 @@ final class CoreDataFavoriteRepository: FavoriteRepositoryProtocol {
 
     func updateFavorite(currency: String, isFavorite: Bool) throws {
         let context = persistentContainer.viewContext
-        let request = Favorite.fetchRequest()
+        let request = FavoriteCurrency.fetchRequest()
         request.predicate = NSPredicate(format: "currency == %@", currency)
         let results = try context.fetch(request)
         

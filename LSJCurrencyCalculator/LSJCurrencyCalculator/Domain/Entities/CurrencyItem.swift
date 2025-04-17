@@ -1,5 +1,5 @@
 //
-//  ExchangeRate.swift
+//  CurrencyItem.swift
 //  LSJCurrencyCalculator
 //
 //  Created by yimkeul on 4/14/25.
@@ -7,8 +7,13 @@
 
 import Foundation
 
-struct ExchangeRate {
+enum RateChangeDirection: String, Codable {
+    case up, down, none
+}
+
+struct CurrencyItem {
     let currency: String
     let rate: Double
+    var change: RateChangeDirection
     var isFavorite: Bool
 }
