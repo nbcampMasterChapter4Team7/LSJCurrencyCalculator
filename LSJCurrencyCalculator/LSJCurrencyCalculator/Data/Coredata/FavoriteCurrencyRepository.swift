@@ -22,11 +22,10 @@ final class FavoriteCurrencyRepository: FavoriteCurrencyRepositoryProtocol {
         return try context.fetch(request)
     }
 
-    func addFavorite(currency: String, rate: Double) throws {
+    func addFavorite(currency: String) throws {
         let context = persistentContainer.viewContext
         let favorite = FavoriteCurrency(context: context)
         favorite.currency = currency
-        favorite.rate = rate
         favorite.isFavorite = true
         try context.save()
     }

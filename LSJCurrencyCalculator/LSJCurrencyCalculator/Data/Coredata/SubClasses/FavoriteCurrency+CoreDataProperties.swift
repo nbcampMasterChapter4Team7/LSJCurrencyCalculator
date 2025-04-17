@@ -18,7 +18,6 @@ extension FavoriteCurrency {
 
     @NSManaged public var currency: String?
     @NSManaged public var isFavorite: Bool
-    @NSManaged public var rate: Double
 
 }
 

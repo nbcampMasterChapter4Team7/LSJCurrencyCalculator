@@ -9,7 +9,7 @@ import Foundation
 
 protocol FavoriteCurrencyRepositoryProtocol {
     func fetchAllFavorites() throws -> [FavoriteCurrency]
-    func addFavorite(currency: String, rate: Double) throws
+    func addFavorite(currency: String) throws
     func removeFavorite(currency: String) throws
     func updateFavorite(currency: String, isFavorite: Bool) throws
 }

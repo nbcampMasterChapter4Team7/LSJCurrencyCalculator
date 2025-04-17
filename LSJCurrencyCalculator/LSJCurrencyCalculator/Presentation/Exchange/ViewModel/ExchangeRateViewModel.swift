@@ -98,10 +98,8 @@ final class ExchangeRateViewModel: ViewModelProtocol {
 
     // 즐겨찾기 토글 처리 함수
      private func toggleFavorite(for currency: String) {
-        guard let rate = allExchangeRates.first(where: { $0.currency == currency })?.rate else { return }
-
         do {
-            try favoriteCurrencyUseCase.toggleFavorite(currency: currency, rate: rate)
+            try favoriteCurrencyUseCase.toggleFavorite(currency: currency)
         } catch {
             state.errorMessage = "즐겨찾기 변경에 실패했습니다."
         }

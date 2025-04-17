@@ -18,8 +18,8 @@ final class FavoriteCurrencyUseCase {
         return try repository.fetchAllFavorites()
     }
 
-    func addFavorite(currency: String, rate: Double) throws {
-        try repository.addFavorite(currency: currency, rate: rate)
+    func addFavorite(currency: String) throws {
+        try repository.addFavorite(currency: currency)
     }
 
     func removeFavorite(currency: String) throws {
@@ -36,12 +36,12 @@ final class FavoriteCurrencyUseCase {
         return favorites.contains { $0.currency == currency }
     }
     
-    // 토글: 이미 즐겨찾기면 삭제, 아니면 추가 (추가 시 rate 정보가 필요)
-    func toggleFavorite(currency: String, rate: Double) throws {
+    // 토글: 이미 즐겨찾기면 삭제, 아니면 추가
+    func toggleFavorite(currency: String) throws {
         if isFavorite(currency: currency) {
             try removeFavorite(currency: currency)
         } else {
-            try addFavorite(currency: currency, rate: rate)
+            try addFavorite(currency: currency)
         }
     }
 }
