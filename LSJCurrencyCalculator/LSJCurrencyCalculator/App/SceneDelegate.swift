@@ -24,13 +24,15 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         let apiClient = APIClient.shared
         let repository = CurrencyItemRepository(apiClient: apiClient)
         let favoriteCurrencyRepository = FavoriteCurrencyRepository(persistentContainer: container)
+        let cachedCurrencRepository = CachedCurrencyRepository(persistentContainer: container)
         
         // Domain Layer
         let currencyItemUseCase = CurrencyItemUseCase(repository: repository)
         let favoriteCurrencyUseCase = FavoriteCurrencyUseCase(repository: favoriteCurrencyRepository)
+        let cachedCurrencyUseCase = CachedCurrencyUseCase(repository: cachedCurrencRepository)
         
         // Presentation Layer
-        let viewModel = ExchangeRateViewModel(currencyItemUseCase: currencyItemUseCase, favoriteCurrencyUseCase: favoriteCurrencyUseCase)
+        let viewModel = ExchangeRateViewModel(currencyItemUseCase: currencyItemUseCase, favoriteCurrencyUseCase: favoriteCurrencyUseCase, cachedCurrencyUseCase: cachedCurrencyUseCase)
         let exchangeRateVC = ExchangeRateViewController(viewModel: viewModel)
         
         // UINavigationController 세팅 (Large title 활성화)
