@@ -8,7 +8,7 @@
 import CoreData
 import Foundation
 
-final class FavoriteCurrencyRepository: FavoriteCurrencyRapositoryProtocol {
+final class FavoriteCurrencyRepository: FavoriteCurrencyRepositoryProtocol {
     
     private let persistentContainer: NSPersistentContainer
     

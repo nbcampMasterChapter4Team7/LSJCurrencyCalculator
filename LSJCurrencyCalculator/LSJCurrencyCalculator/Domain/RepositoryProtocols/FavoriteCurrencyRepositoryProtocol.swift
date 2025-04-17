@@ -1,5 +1,5 @@
 //
-//  FavoriteCurrencyRapositoryProtocol.swift
+//  FavoriteCurrencyRepositoryProtocol.swift
 //  LSJCurrencyCalculator
 //
 //  Created by yimkeul on 4/16/25.
@@ -7,7 +7,7 @@
 
 import Foundation
 
-protocol FavoriteCurrencyRapositoryProtocol {
+protocol FavoriteCurrencyRepositoryProtocol {
     func fetchAllFavorites() throws -> [FavoriteCurrency]
     func addFavorite(currency: String, rate: Double) throws
     func removeFavorite(currency: String) throws
