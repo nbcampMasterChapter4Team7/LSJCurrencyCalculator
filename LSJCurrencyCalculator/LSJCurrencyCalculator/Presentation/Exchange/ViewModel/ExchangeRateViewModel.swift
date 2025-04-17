@@ -38,13 +38,13 @@ final class ExchangeRateViewModel: ViewModelProtocol {
     private var allExchangeRates: [CurrencyItem] = []
 
     // UseCase 의존성
-    private let fetchExchangeRateUseCase: CurrencyItemUseCase
+    private let currencyItemUseCase: CurrencyItemUseCase
     // 즐겨찾기 관련 UseCase (CoreData를 이용한 CRUD 기능을 포함)
-    private let manageFavoriteUseCase: FavoriteCurrencyUseCase
+    private let favoriteCurrencyUseCase: FavoriteCurrencyUseCase
 
-    init(fetchExchangeRateUseCase: CurrencyItemUseCase, manageFavoriteUseCase: FavoriteCurrencyUseCase) {
-        self.fetchExchangeRateUseCase = fetchExchangeRateUseCase
-        self.manageFavoriteUseCase = manageFavoriteUseCase
+    init(currencyItemUseCase: CurrencyItemUseCase, favoriteCurrencyUseCase: FavoriteCurrencyUseCase) {
+        self.currencyItemUseCase = currencyItemUseCase
+        self.favoriteCurrencyUseCase = favoriteCurrencyUseCase
 
         // action 클로저 구현
         self.action = { [weak self] action in
@@ -61,7 +61,7 @@ final class ExchangeRateViewModel: ViewModelProtocol {
 
     // 실제 데이터를 불러오는 함수
     private func fetchRates(base: String) {
-        fetchExchangeRateUseCase.execute(base: base) { [weak self] result in
+        currencyItemUseCase.execute(base: base) { [weak self] result in
             DispatchQueue.main.async {
                 switch result {
                 case .success(let rates):
@@ -101,7 +101,7 @@ final class ExchangeRateViewModel: ViewModelProtocol {
         guard let rate = allExchangeRates.first(where: { $0.currency == currency })?.rate else { return }
 
         do {
-            try manageFavoriteUseCase.toggleFavorite(currency: currency, rate: rate)
+            try favoriteCurrencyUseCase.toggleFavorite(currency: currency, rate: rate)
         } catch {
             state.errorMessage = "즐겨찾기 변경에 실패했습니다."
         }
@@ -114,8 +114,8 @@ final class ExchangeRateViewModel: ViewModelProtocol {
     // 즐겨찾기된 항목은 상단에 오고, 같은 그룹 내에서는 알파벳 순 정렬
      private func applyFavoriteSorting(to rates: [CurrencyItem]) -> [CurrencyItem] {
         return rates.sorted { left, right in
-            let leftFav = manageFavoriteUseCase.isFavorite(currency: left.currency)
-            let rightFav = manageFavoriteUseCase.isFavorite(currency: right.currency)
+            let leftFav = favoriteCurrencyUseCase.isFavorite(currency: left.currency)
+            let rightFav = favoriteCurrencyUseCase.isFavorite(currency: right.currency)
             if leftFav != rightFav {
                 return leftFav && !rightFav
             }
@@ -124,7 +124,7 @@ final class ExchangeRateViewModel: ViewModelProtocol {
     }
     
     func isFavorite(currency: String) -> Bool {
-        return manageFavoriteUseCase.isFavorite(currency: currency)
+        return favoriteCurrencyUseCase.isFavorite(currency: currency)
     }
 
 }
