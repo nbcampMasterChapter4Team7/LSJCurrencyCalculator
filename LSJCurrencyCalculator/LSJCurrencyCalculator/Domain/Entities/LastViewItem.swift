@@ -7,12 +7,12 @@
 
 import Foundation
 
-enum ScreenType {
+enum ScreenType: String, Codable {
     case exchange
-    case caculator
+    case calculator
 }
 
 struct LastViewItem {
     let screenType: ScreenType
-    let currencyCode: String
+    let currencyCode: String?
 }
