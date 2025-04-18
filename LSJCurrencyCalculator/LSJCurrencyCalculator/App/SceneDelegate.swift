@@ -22,7 +22,12 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         
         // Data Layer
         let apiClient = APIClient.shared
-        let repository = CurrencyItemRepository(apiClient: apiClient)
+        let useFileMock = true
+
+        let repository: CurrencyItemRepositoryProtocol = useFileMock
+            ? FileCurrencyItemRepository(filename: "sample.json")
+            : CurrencyItemRepository(apiClient: apiClient)
+
         let favoriteCurrencyRepository = FavoriteCurrencyRepository(persistentContainer: container)
         let cachedCurrencRepository = CachedCurrencyRepository(persistentContainer: container)
         
@@ -39,6 +44,9 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         let navigationController = UINavigationController(rootViewController: exchangeRateVC)
         navigationController.navigationBar.prefersLargeTitles = true
         
+        if let directoryLocation = FileManager.default.urls(for: .libraryDirectory, in: .userDomainMask).last {
+            print("Documents Directory: \(directoryLocation)Application Support")
+        }
         // UIWindow 세팅
         window = UIWindow(windowScene: windowScene)
         window?.rootViewController = navigationController

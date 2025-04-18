@@ -15,6 +15,12 @@ final class CachedCurrencyRepository: CachedCurrencyRepositoryProtocol {
     init(persistentContainer: NSPersistentContainer) {
         self.persistentContainer = persistentContainer
     }
+    
+    func fetchAllCachedCurrency() throws -> [CachedCurrency] {
+        let context = persistentContainer.viewContext
+        let request = CachedCurrency.fetchRequest()
+        return try context.fetch(request)
+    }
 
     func isNeedCompare(timeUnix: Int) throws -> Bool {
         let context = persistentContainer.viewContext
@@ -58,7 +64,7 @@ final class CachedCurrencyRepository: CachedCurrencyRepositoryProtocol {
         }
     }
 
-    func saveCurrency(currencyCode: String, rate: Double, timeUnix: Int) throws {
+    func saveCurrency(currencyCode: String, rate: Double, timeUnix: Int, change: String) throws {
         let context = persistentContainer.viewContext
         let request = CachedCurrency.fetchRequest()
         request.predicate = NSPredicate(format: "currencyCode == %@", currencyCode)
@@ -67,12 +73,16 @@ final class CachedCurrencyRepository: CachedCurrencyRepositoryProtocol {
         let entity: CachedCurrency
         if let e = existing {
             entity = e
+            print("TT : existing")
         } else {
             entity = CachedCurrency(context: context)
             entity.currencyCode = currencyCode
+            print("TT : new save")
         }
         entity.rate = rate
         entity.timeUnix = Int64(timeUnix)
+        entity.change = change
+        print(entity.rate , entity.timeUnix, entity.change)
         try context.save()
     }
 }

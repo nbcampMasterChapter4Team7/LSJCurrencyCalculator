@@ -2,7 +2,7 @@
 //  CachedCurrency+CoreDataProperties.swift
 //  LSJCurrencyCalculator
 //
-//  Created by yimkeul on 4/17/25.
+//  Created by yimkeul on 4/18/25.
 //
 //
 
@@ -16,9 +16,10 @@ extension CachedCurrency {
         return NSFetchRequest<CachedCurrency>(entityName: "CachedCurrency")
     }
 
-    @NSManaged public var currencyCode: String?
-    @NSManaged public var timeUnix: Int64
+    @NSManaged public var currencyCode: String
     @NSManaged public var rate: Double
+    @NSManaged public var timeUnix: Int64
+    @NSManaged public var change: String
 
 }
 
