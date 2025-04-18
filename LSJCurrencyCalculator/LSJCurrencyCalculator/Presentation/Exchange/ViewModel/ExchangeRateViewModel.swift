@@ -36,17 +36,20 @@ final class ExchangeRateViewModel: ViewModelProtocol {
     private let favoriteCurrencyUseCase: FavoriteCurrencyUseCase
     private let cachedCurrencyUseCase: CachedCurrencyUseCase
     private let lastViewItemUseCase: LastViewItemUseCase
-    
+    private let fetchExchangeRatesUseCase: FetchExchangeRatesUseCase
+
     init(
         currencyItemUseCase: CurrencyItemUseCase,
         favoriteCurrencyUseCase: FavoriteCurrencyUseCase,
         cachedCurrencyUseCase: CachedCurrencyUseCase,
-        lastViewItemUseCase: LastViewItemUseCase
+        lastViewItemUseCase: LastViewItemUseCase,
+        fetchExchangeRatesUseCase: FetchExchangeRatesUseCase
     ) {
         self.currencyItemUseCase = currencyItemUseCase
         self.favoriteCurrencyUseCase = favoriteCurrencyUseCase
         self.cachedCurrencyUseCase = cachedCurrencyUseCase
         self.lastViewItemUseCase = lastViewItemUseCase
+        self.fetchExchangeRatesUseCase = fetchExchangeRatesUseCase
 
         self.action = { [weak self] action in
             guard let self = self else { return }
@@ -62,7 +65,7 @@ final class ExchangeRateViewModel: ViewModelProtocol {
             }
         }
     }
-    
+
     private func saveLastViewItem() {
         do {
             let lastViewItem = LastViewItem(
@@ -76,61 +79,22 @@ final class ExchangeRateViewModel: ViewModelProtocol {
     }
 
     private func fetchRates(base: String) {
-        currencyItemUseCase.execute(base: base) { [weak self] result in
+        fetchExchangeRatesUseCase.execute(base: base) { [weak self] result in
             DispatchQueue.main.async {
                 guard let self = self else { return }
                 switch result {
-                case .success(let currencyItems):
-                    var items: [CurrencyItem] = []
-                    guard let firstItem = currencyItems.first else {
-                        return
-                    }
-                    do {
-                        // 서로 timeUTC가 다른경우에는 비교하기
-                        if try self.cachedCurrencyUseCase.isNeedCompare(timeUnix: firstItem.timeUnix) {
-                            // 끝나고 데이터 저장.
-                            for currencyItem in currencyItems {
-                                var dir: RateChangeDirection = .none
-                                do {
-                                    dir = try self.cachedCurrencyUseCase.compareCurrency(currencyCode: currencyItem.currencyCode, newCurrencyItem: currencyItem)
-                                } catch {
-                                    print("비교 실패")
-                                }
-
-                                do {
-                                    try self.cachedCurrencyUseCase.saveCurrency(currencyCode: currencyItem.currencyCode, rate: currencyItem.rate, timeUnix: firstItem.timeUnix, change: dir.rawValue)
-                                } catch {
-                                    print("저장 실패")
-                                }
-                                items.append(CurrencyItem(currencyCode: currencyItem.currencyCode, rate: currencyItem.rate, timeUnix: firstItem.timeUnix, change: dir, isFavorite: false))
-                            }
-                        } else {
-                            // 서로 timeUTC가 같은 경우 CoreData에서 캐시데이터 불러오기
-                            do {
-                                let cachedCurrencys = try self.cachedCurrencyUseCase.fetchAllCachedCurrency()
-                                items = cachedCurrencys.compactMap { cachedCurrency in
-                                    CurrencyItem(currencyCode: cachedCurrency.currencyCode, rate: cachedCurrency.rate, timeUnix: firstItem.timeUnix, change: RateChangeDirection(rawValue: cachedCurrency.change) ?? .none, isFavorite: false)
-                                }
-                            } catch {
-                                // 캐시데이터도 없는 경우 API 데이터 렌더링
-                                items = currencyItems
-                            }
-                        }
-                        let sortedRates = items.sorted { $0.currencyCode < $1.currencyCode }
-                        self.allDisplayItems = sortedRates
-                        self.state.currencyItems = self.applyFavoriteSorting(to: sortedRates)
-                        self.state.errorMessage = nil
-                    } catch {
-                        print("비교 실패")
-                        self.failureFetchState()
-                    }
+                case .success(let items):
+                    let sorted = items.sorted { $0.currencyCode < $1.currencyCode }
+                    self.allDisplayItems = sorted
+                    self.state.currencyItems = self.applyFavoriteSorting(to: sorted)
+                    self.state.errorMessage = nil
                 case .failure:
                     self.failureFetchState()
                 }
             }
         }
     }
-    
+
     private func failureFetchState() {
         self.allDisplayItems = []
         self.state.currencyItems = []
