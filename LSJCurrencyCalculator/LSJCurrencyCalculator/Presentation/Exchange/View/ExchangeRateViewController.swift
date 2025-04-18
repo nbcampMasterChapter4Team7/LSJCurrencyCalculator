@@ -34,8 +34,7 @@ final class ExchangeRateViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        navigationItem.title = "환율 목록"
-
+        
         setStyles()
         setLayout()
         setUIComponents()

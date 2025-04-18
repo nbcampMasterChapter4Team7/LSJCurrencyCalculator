@@ -43,6 +43,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         // Presentation Layer
         let viewModel = ExchangeRateViewModel(currencyItemUseCase: currencyItemUseCase, favoriteCurrencyUseCase: favoriteCurrencyUseCase, cachedCurrencyUseCase: cachedCurrencyUseCase, lastViewItemUseCase: lastViewItemUseCase, fetchExchangeRatesUseCase: fetchExchangeRatesUseCase)
         let exchangeRateVC = ExchangeRateViewController(viewModel: viewModel, lastViewItemUseCase: lastViewItemUseCase)
+        exchangeRateVC.navigationItem.title = "환율 목록"
+        exchangeRateVC.navigationItem.backButtonTitle = "환율 목록"
 
         // UINavigationController 세팅 (Large title 활성화)
         let navigationController = UINavigationController(rootViewController: exchangeRateVC)
