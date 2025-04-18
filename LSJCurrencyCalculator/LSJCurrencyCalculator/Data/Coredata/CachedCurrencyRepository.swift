@@ -44,7 +44,6 @@ final class CachedCurrencyRepository: CachedCurrencyRepositoryProtocol {
         let result = try context.fetch(request)
 
         if let target = result.first {
-            print("fectch Cache : \(target.currencyCode ?? "") - \(target.rate) - \(target.timeUnix)")
             return target
         }
         print("no fetch cache data")
