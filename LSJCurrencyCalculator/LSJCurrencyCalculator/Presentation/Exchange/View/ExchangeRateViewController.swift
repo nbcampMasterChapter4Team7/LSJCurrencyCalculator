@@ -12,15 +12,20 @@ import Then
 final class ExchangeRateViewController: UIViewController {
 
     private let viewModel: ExchangeRateViewModel
+    private let lastViewItemUseCase: LastViewItemUseCase
     private let tableView = UITableView()
     private let searchBar = UISearchBar().then {
         $0.placeholder = "통화 검색"
         $0.backgroundImage = UIImage() // 검색바 위/아래 테두리 제거
     }
 
-    init(viewModel: ExchangeRateViewModel) {
-        self.viewModel = viewModel
-        super.init(nibName: nil, bundle: nil)
+    init(
+      viewModel: ExchangeRateViewModel,
+      lastViewItemUseCase: LastViewItemUseCase
+    ) {
+      self.viewModel = viewModel
+      self.lastViewItemUseCase = lastViewItemUseCase
+      super.init(nibName: nil, bundle: nil)
     }
 
     required init?(coder: NSCoder) {
@@ -38,6 +43,12 @@ final class ExchangeRateViewController: UIViewController {
 
         // 데이터를 요청하는 action 전달
         viewModel.action?(.fetchRates(base: "USD"))
+        viewModel.action?(.saveLastViewItem)
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        viewModel.action?(.saveLastViewItem)
     }
 
     private func setStyles() {
@@ -128,9 +139,9 @@ extension ExchangeRateViewController: UITableViewDataSource, UITableViewDelegate
 
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let selectedRate = viewModel.state.currencyItems[indexPath.row]
-        let caculatorViewModel = CaculatorViewModel(selectedCurrencyItem: selectedRate)
-        let caculatorViewController = CaculatorViewController(viewModel: caculatorViewModel)
-        navigationController?.pushViewController(caculatorViewController, animated: true)
+        let calculatorViewModel = CalculatorViewModel(selectedCurrencyItem: selectedRate, lastViewItemUseCase: lastViewItemUseCase)
+        let calculatorViewController = CalculatorViewController(viewModel: calculatorViewModel)
+        navigationController?.pushViewController(calculatorViewController, animated: true)
     }
 }
 

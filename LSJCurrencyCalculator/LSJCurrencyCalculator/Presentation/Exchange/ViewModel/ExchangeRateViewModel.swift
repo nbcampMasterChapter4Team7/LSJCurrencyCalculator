@@ -14,6 +14,7 @@ final class ExchangeRateViewModel: ViewModelProtocol {
         case fetchRates(base: String)
         case filterRates(searchText: String)
         case toggleFavorite(currencyCode: String)
+        case saveLastViewItem
     }
 
     struct State {
@@ -34,15 +35,18 @@ final class ExchangeRateViewModel: ViewModelProtocol {
     private let currencyItemUseCase: CurrencyItemUseCase
     private let favoriteCurrencyUseCase: FavoriteCurrencyUseCase
     private let cachedCurrencyUseCase: CachedCurrencyUseCase
-
+    private let lastViewItemUseCase: LastViewItemUseCase
+    
     init(
         currencyItemUseCase: CurrencyItemUseCase,
         favoriteCurrencyUseCase: FavoriteCurrencyUseCase,
-        cachedCurrencyUseCase: CachedCurrencyUseCase
+        cachedCurrencyUseCase: CachedCurrencyUseCase,
+        lastViewItemUseCase: LastViewItemUseCase
     ) {
         self.currencyItemUseCase = currencyItemUseCase
         self.favoriteCurrencyUseCase = favoriteCurrencyUseCase
         self.cachedCurrencyUseCase = cachedCurrencyUseCase
+        self.lastViewItemUseCase = lastViewItemUseCase
 
         self.action = { [weak self] action in
             guard let self = self else { return }
@@ -53,7 +57,21 @@ final class ExchangeRateViewModel: ViewModelProtocol {
                 self.filterRates(with: searchText)
             case .toggleFavorite(let code):
                 self.toggleFavorite(for: code)
+            case .saveLastViewItem:
+                self.saveLastViewItem()
             }
+        }
+    }
+    
+    private func saveLastViewItem() {
+        do {
+            let lastViewItem = LastViewItem(
+                screenType: .exchange,
+                currencyCode: nil
+            )
+            try self.lastViewItemUseCase.saveLastViewItem(lastViewItem: lastViewItem)
+        } catch {
+            print("Last view save failed: \(error)")
         }
     }
 
@@ -65,7 +83,6 @@ final class ExchangeRateViewModel: ViewModelProtocol {
                 case .success(let currencyItems):
                     var items: [CurrencyItem] = []
                     guard let firstItem = currencyItems.first else {
-                        NSLog("TT : firstItem 없음")
                         return
                     }
                     do {
@@ -95,7 +112,6 @@ final class ExchangeRateViewModel: ViewModelProtocol {
                                     CurrencyItem(currencyCode: cachedCurrency.currencyCode, rate: cachedCurrency.rate, timeUnix: firstItem.timeUnix, change: RateChangeDirection(rawValue: cachedCurrency.change) ?? .none, isFavorite: false)
                                 }
                             } catch {
-                                print("TT : checkPoint")
                                 // 캐시데이터도 없는 경우 API 데이터 렌더링
                                 items = currencyItems
                             }

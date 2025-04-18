@@ -15,38 +15,68 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
         guard let windowScene = (scene as? UIWindowScene) else { return }
-        
+
         // AppDelegatea 내의 Coredata Container 설정
         let appDelegate = UIApplication.shared.delegate as! AppDelegate
         let container = appDelegate.persistentContainer
-        
+
         // Data Layer
         let apiClient = APIClient.shared
-        let useFileMock = true
-
-        let repository: CurrencyItemRepositoryProtocol = useFileMock
-            ? FileCurrencyItemRepository(filename: "sample.json")
-            : CurrencyItemRepository(apiClient: apiClient)
+//        let useFileMock = true
+// MARK: TEST
+//        let repository: CurrencyItemRepositoryProtocol = useFileMock
+//            ? FileCurrencyItemRepository(filename: "sample.json")
+//        : CurrencyItemRepository(apiClient: apiClient)
+        let repository: CurrencyItemRepositoryProtocol = CurrencyItemRepository(apiClient: apiClient)
 
         let favoriteCurrencyRepository = FavoriteCurrencyRepository(persistentContainer: container)
-        let cachedCurrencRepository = CachedCurrencyRepository(persistentContainer: container)
-        
+        let cachedCurrencyRepository = CachedCurrencyRepository(persistentContainer: container)
+        let lastViewRepository = LastViewRepository(persistentContainer: container)
+
         // Domain Layer
         let currencyItemUseCase = CurrencyItemUseCase(repository: repository)
         let favoriteCurrencyUseCase = FavoriteCurrencyUseCase(repository: favoriteCurrencyRepository)
-        let cachedCurrencyUseCase = CachedCurrencyUseCase(repository: cachedCurrencRepository)
-        
+        let cachedCurrencyUseCase = CachedCurrencyUseCase(repository: cachedCurrencyRepository)
+        let lastViewItemUseCase = LastViewItemUseCase(repository: lastViewRepository)
+
         // Presentation Layer
-        let viewModel = ExchangeRateViewModel(currencyItemUseCase: currencyItemUseCase, favoriteCurrencyUseCase: favoriteCurrencyUseCase, cachedCurrencyUseCase: cachedCurrencyUseCase)
-        let exchangeRateVC = ExchangeRateViewController(viewModel: viewModel)
-        
+        let viewModel = ExchangeRateViewModel(currencyItemUseCase: currencyItemUseCase, favoriteCurrencyUseCase: favoriteCurrencyUseCase, cachedCurrencyUseCase: cachedCurrencyUseCase, lastViewItemUseCase: lastViewItemUseCase)
+        let exchangeRateVC = ExchangeRateViewController(viewModel: viewModel, lastViewItemUseCase: lastViewItemUseCase)
+
         // UINavigationController 세팅 (Large title 활성화)
         let navigationController = UINavigationController(rootViewController: exchangeRateVC)
         navigationController.navigationBar.prefersLargeTitles = true
-        
-        if let directoryLocation = FileManager.default.urls(for: .libraryDirectory, in: .userDomainMask).last {
-            print("Documents Directory: \(directoryLocation)Application Support")
+
+        // Restore Last Viewed Screen
+        if let last = try? lastViewItemUseCase.loadLastViewItem() {
+            switch ScreenType(rawValue: last.screenType) {
+            case .calculator:
+                if let code = last.currencyCode {
+                    let cachedCurrencys = try? cachedCurrencyUseCase.fetchAllCachedCurrency()
+                    let timeUnix = Int(cachedCurrencys?.first?.timeUnix ?? 0)
+
+                    let fetchCacheCurrency = try? cachedCurrencyUseCase.fetchCachedCurrency(currencyCode: code)
+
+                    let selectedCurrencyItem = CurrencyItem(
+                        currencyCode: fetchCacheCurrency?.currencyCode ?? "",
+                        rate: fetchCacheCurrency?.rate ?? 0,
+                        timeUnix: timeUnix,
+                        change: RateChangeDirection(rawValue: fetchCacheCurrency!.change) ?? .none,
+                        isFavorite: false
+                    )
+
+                    let calculatorViewModel = CalculatorViewModel(selectedCurrencyItem: selectedCurrencyItem, lastViewItemUseCase: lastViewItemUseCase)
+                    let calculatorViewController = CalculatorViewController(viewModel: calculatorViewModel)
+                    navigationController.pushViewController(calculatorViewController, animated: true)
+                }
+            default:
+                break
+            }
+        } else {
+            print("AASDFAS")
         }
+
+
         // UIWindow 세팅
         window = UIWindow(windowScene: windowScene)
         window?.rootViewController = navigationController

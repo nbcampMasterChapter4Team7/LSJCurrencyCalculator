@@ -1,5 +1,5 @@
 //
-//  CaculatorViewModel.swift
+//  CalculatorViewModel.swift
 //  LSJCurrencyCalculator
 //
 //  Created by yimkeul on 4/15/25.
@@ -7,11 +7,12 @@
 
 import Foundation
 
-final class CaculatorViewModel: ViewModelProtocol {
+final class CalculatorViewModel: ViewModelProtocol {
 
     // Action 정의: 사용자가 입력하거나 버튼을 누를 때 발생하는 이벤트
     enum Action {
         case convertCurrency(String)  // 버튼 클릭 시, 입력값을 바탕으로 변환 요청
+        case saveLastViewItem
     }
     
     // State 정의: 계산기에 필요한 상태 값들
@@ -37,10 +38,13 @@ final class CaculatorViewModel: ViewModelProtocol {
     
     // 선택한 환율 정보를 저장합니다.
     let selectedCurrencyItem: CurrencyItem
+    
+    private let lastViewItemUseCase: LastViewItemUseCase
 
     // 초기화 시 선택한 환율 정보를 받습니다.
-    init(selectedCurrencyItem: CurrencyItem) {
+    init(selectedCurrencyItem: CurrencyItem, lastViewItemUseCase: LastViewItemUseCase) {
         self.selectedCurrencyItem = selectedCurrencyItem
+        self.lastViewItemUseCase = lastViewItemUseCase
         
         // Action 클로저 구현: 각 액션에 따른 처리
         self.action = { [weak self] action in
@@ -48,9 +52,24 @@ final class CaculatorViewModel: ViewModelProtocol {
             switch action {
             case .convertCurrency(let input):
                 self.convert(input: input)
+            case .saveLastViewItem:
+                self.saveLastView()
             }
         }
     }
+    
+    private func saveLastView() {
+        do {
+            let lastViewItem = LastViewItem(
+                screenType: .calculator,
+                currencyCode: selectedCurrencyItem.currencyCode
+            )
+            try lastViewItemUseCase.saveLastViewItem(lastViewItem: lastViewItem)
+        } catch {
+            print("Last view save failed: \(error)")
+        }
+    }
+
     
     // 변환 로직: 입력값 검증 후 비동기 API 호출(시뮬레이션)
     private func convert(input: String) {

@@ -1,5 +1,5 @@
 //
-//  CaculatorViewController.swift
+//  CalculatorViewController.swift
 //  LSJCurrencyCalculator
 //
 //  Created by yimkeul on 4/15/25.
@@ -10,9 +10,9 @@ import UIKit
 import SnapKit
 import Then
 
-final class CaculatorViewController: UIViewController {
+final class CalculatorViewController: UIViewController {
 
-    private let viewModel: CaculatorViewModel
+    private let viewModel: CalculatorViewModel
 
     private let labelStackView = UIStackView().then {
         $0.axis = .vertical
@@ -53,7 +53,7 @@ final class CaculatorViewController: UIViewController {
         $0.numberOfLines = 0
     }
 
-    init(viewModel: CaculatorViewModel) {
+    init(viewModel: CalculatorViewModel) {
         self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
     }
@@ -72,6 +72,7 @@ final class CaculatorViewController: UIViewController {
 
         // 환율 계산 버튼을 눌렀을 때 행동 처리
         convertButton.addTarget(self, action: #selector(convertButtonTapped), for: .touchUpInside)
+        viewModel.action?(.saveLastViewItem)
     }
 
     private func setStyles() {
