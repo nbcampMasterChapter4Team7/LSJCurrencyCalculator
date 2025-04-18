@@ -16,7 +16,7 @@ extension LastView {
         return NSFetchRequest<LastView>(entityName: "LastView")
     }
 
-    @NSManaged public var screenType: String?
+    @NSManaged public var screenType: String
     @NSManaged public var currencyCode: String?
 
 }
