@@ -84,4 +84,47 @@ final class CachedCurrencyRepository: CachedCurrencyRepositoryProtocol {
         print(entity.rate , entity.timeUnix, entity.change)
         try context.save()
     }
+    
+    func compareAndUpdateRates(currencyItems: [CurrencyItem]) throws -> [CurrencyItem] {
+        guard let first = currencyItems.first else { return [] }
+        let currentTime = first.timeUnix
+        if try isNeedCompare(timeUnix: currentTime) {
+            // 시간 다르면 하나씩 비교 후 캐시 저장
+            var result: [CurrencyItem] = []
+            for item in currencyItems {
+                let direction = try compareCurrency(
+                    currencyCode: item.currencyCode,
+                    newCurrencyItem: item
+                )
+                // 캐시에 저장
+                try saveCurrency(currencyCode: item.currencyCode,
+                                               rate: item.rate,
+                                               timeUnix: currentTime, change: direction.rawValue
+                )
+                // Domain 엔티티 생성
+                result.append(
+                    CurrencyItem(
+                        currencyCode: item.currencyCode,
+                        rate: item.rate,
+                        timeUnix: currentTime,
+                        change: direction,
+                        isFavorite: false
+                    )
+                )
+            }
+            return result
+        } else {
+            // 시간 같으면 캐시된 모든 환율을 로드
+            let cached = try fetchAllCachedCurrency()
+            return cached.map { c in
+                CurrencyItem(
+                    currencyCode: c.currencyCode,
+                    rate: c.rate,
+                    timeUnix: currentTime,
+                    change: RateChangeDirection(rawValue: c.change) ?? .none,
+                    isFavorite: false
+                )
+            }
+        }
+    }
 }

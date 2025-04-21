@@ -31,5 +31,11 @@ final class CachedCurrencyUseCase {
     func isNeedCompare(timeUnix: Int) throws -> Bool {
         return try repository.isNeedCompare(timeUnix: timeUnix)
     }
+    
+    func compareAndUpdateRates(currencyItems: [CurrencyItem]) throws -> [CurrencyItem] {
+        return try repository.compareAndUpdateRates(currencyItems: currencyItems)
+    }
+    
+    
 }
 
