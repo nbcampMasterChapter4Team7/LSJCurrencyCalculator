@@ -1,5 +1,5 @@
 //
-//  APIClient.swift
+//  URLSessionAPIClient.swift
 //  LSJCurrencyCalculator
 //
 //  Created by yimkeul on 4/14/25.
@@ -7,7 +7,7 @@
 
 import Foundation
 
-final class APIClient: APIClientProtocol {
+final class URLSessionAPIClient: APIClientProtocol {
 
     func request<T: Decodable>(
         _ endpoint: Endpoint,

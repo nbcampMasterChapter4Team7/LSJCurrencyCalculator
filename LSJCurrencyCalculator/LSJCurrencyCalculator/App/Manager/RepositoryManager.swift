@@ -14,7 +14,8 @@ final class RepositoryManager {
         cacheRepo: CachedCurrencyRepository,
         lastViewRepo: LastViewRepository)
     {
-        let apiClient = APIClient()
+//        let apiClient = URLSessionAPIClient()
+        let apiClient = AlamofireAPIClient()
         let currencyRepo = CurrencyItemRepository(apiClient: apiClient)
         let favoriteRepo = FavoriteCurrencyRepository(persistentContainer: container)
         let cacheRepo = CachedCurrencyRepository(persistentContainer: container)
