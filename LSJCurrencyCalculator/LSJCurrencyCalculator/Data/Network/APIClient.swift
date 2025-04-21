@@ -7,18 +7,24 @@
 
 import Foundation
 
-final class APIClient {
-    static let shared = APIClient()
+final class APIClient: APIClientProtocol {
 
-    func request<T: Codable>(_ endpoint: Endpoint, completion: @escaping (Result<T, Error>) -> Void) {
+    func request<T: Decodable>(
+        _ endpoint: Endpoint,
+        completion: @escaping (Result<T, Error>) -> Void
+    ) {
         let task = URLSession.shared.dataTask(with: endpoint.urlRequest) { data, response, error in
-            guard let data = data, error == nil else {
-                completion(.failure(error!))
+            if let error = error {
+                completion(.failure(error))
+                return
+            }
+            guard let data = data else {
+                completion(.failure(NSError(domain: "NoData", code: 0)))
                 return
             }
             do {
-                let result = try JSONDecoder().decode(T.self, from: data)
-                completion(.success(result))
+                let decoded = try JSONDecoder().decode(T.self, from: data)
+                completion(.success(decoded))
             } catch {
                 completion(.failure(error))
             }
@@ -26,3 +32,4 @@ final class APIClient {
         task.resume()
     }
 }
+
