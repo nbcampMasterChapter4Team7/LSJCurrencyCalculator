@@ -21,12 +21,14 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         let container = appDelegate.persistentContainer
 
         // Data Layer
-        let apiClient = APIClient.shared
+        let apiClient = APIClient()
+        
+        // MARK: TEST
 //        let useFileMock = true
-// MARK: TEST
 //        let repository: CurrencyItemRepositoryProtocol = useFileMock
 //            ? FileCurrencyItemRepository(filename: "sample.json")
 //        : CurrencyItemRepository(apiClient: apiClient)
+        
         let repository: CurrencyItemRepositoryProtocol = CurrencyItemRepository(apiClient: apiClient)
 
         let favoriteCurrencyRepository = FavoriteCurrencyRepository(persistentContainer: container)
@@ -38,16 +40,15 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         let favoriteCurrencyUseCase = FavoriteCurrencyUseCase(repository: favoriteCurrencyRepository)
         let cachedCurrencyUseCase = CachedCurrencyUseCase(repository: cachedCurrencyRepository)
         let lastViewItemUseCase = LastViewItemUseCase(repository: lastViewRepository)
-        let fetchExchangeRatesUseCase = FetchExchangeRatesUseCase(repository: repository, cachedUseCase: cachedCurrencyUseCase)
 
         // Presentation Layer
-        let viewModel = ExchangeRateViewModel(currencyItemUseCase: currencyItemUseCase, favoriteCurrencyUseCase: favoriteCurrencyUseCase, cachedCurrencyUseCase: cachedCurrencyUseCase, lastViewItemUseCase: lastViewItemUseCase, fetchExchangeRatesUseCase: fetchExchangeRatesUseCase)
-        let exchangeRateVC = ExchangeRateViewController(viewModel: viewModel, lastViewItemUseCase: lastViewItemUseCase)
-        exchangeRateVC.navigationItem.title = "환율 목록"
-        exchangeRateVC.navigationItem.backButtonTitle = "환율 목록"
+        let exchangeRateViewModel = ExchangeRateViewModel(currencyItemUseCase: currencyItemUseCase, favoriteCurrencyUseCase: favoriteCurrencyUseCase, cachedCurrencyUseCase: cachedCurrencyUseCase, lastViewItemUseCase: lastViewItemUseCase)
+        let exchangeRateViewController = ExchangeRateViewController(viewModel: exchangeRateViewModel, lastViewItemUseCase: lastViewItemUseCase)
+        exchangeRateViewController.navigationItem.title = "환율 목록"
+        exchangeRateViewController.navigationItem.backButtonTitle = "환율 목록"
 
         // UINavigationController 세팅 (Large title 활성화)
-        let navigationController = UINavigationController(rootViewController: exchangeRateVC)
+        let navigationController = UINavigationController(rootViewController: exchangeRateViewController)
         navigationController.navigationBar.prefersLargeTitles = true
 
         // Restore Last Viewed Screen
@@ -76,7 +77,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
                 break
             }
         } else {
-            print("AASDFAS")
+            print("최근 페이지 추적 실패")
         }
 
 
