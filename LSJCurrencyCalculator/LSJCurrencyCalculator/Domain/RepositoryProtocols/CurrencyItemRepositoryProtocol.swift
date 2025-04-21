@@ -8,5 +8,5 @@
 import Foundation
 
 protocol CurrencyItemRepositoryProtocol {
-    func fetchCurrencyItem(base: String, completion: @escaping (Result<[CurrencyItem], Error>) -> Void)
+    func fetchCurrencyItem(base: String, completion: @escaping (Result<[CurrencyItem], Error>) -> Void) throws
 }

@@ -13,8 +13,16 @@ final class CurrencyItemUseCase {
     init(repository: CurrencyItemRepositoryProtocol) {
         self.repository = repository
     }
-
-    func execute(base: String, completion: @escaping (Result<[CurrencyItem], Error>) -> Void) {
-        repository.fetchCurrencyItem(base: base, completion: completion)
+    
+    func fetchCurrencyItem(
+        base: String,
+        completion: @escaping (Result<[CurrencyItem], Error>) -> Void
+    ) {
+        do {
+            try repository.fetchCurrencyItem(base: base, completion: completion)
+        } catch {
+            // repository.fetchCurrencyItem 에서 throw 된 에러를 completion으로 전달
+            completion(.failure(error))
+        }
     }
 }
