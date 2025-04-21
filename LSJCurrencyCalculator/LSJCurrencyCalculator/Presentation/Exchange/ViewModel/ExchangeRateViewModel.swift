@@ -11,7 +11,7 @@ import Foundation
 final class ExchangeRateViewModel: ViewModelProtocol {
 
     enum Action {
-        case fetchRates(base: String)
+        case fetchCurrencyItem(base: String)
         case filterRates(searchText: String)
         case toggleFavorite(currencyCode: String)
         case saveLastViewItem
@@ -36,26 +36,23 @@ final class ExchangeRateViewModel: ViewModelProtocol {
     private let favoriteCurrencyUseCase: FavoriteCurrencyUseCase
     private let cachedCurrencyUseCase: CachedCurrencyUseCase
     private let lastViewItemUseCase: LastViewItemUseCase
-    private let fetchExchangeRatesUseCase: FetchExchangeRatesUseCase
 
     init(
         currencyItemUseCase: CurrencyItemUseCase,
         favoriteCurrencyUseCase: FavoriteCurrencyUseCase,
         cachedCurrencyUseCase: CachedCurrencyUseCase,
-        lastViewItemUseCase: LastViewItemUseCase,
-        fetchExchangeRatesUseCase: FetchExchangeRatesUseCase
+        lastViewItemUseCase: LastViewItemUseCase
     ) {
         self.currencyItemUseCase = currencyItemUseCase
         self.favoriteCurrencyUseCase = favoriteCurrencyUseCase
         self.cachedCurrencyUseCase = cachedCurrencyUseCase
         self.lastViewItemUseCase = lastViewItemUseCase
-        self.fetchExchangeRatesUseCase = fetchExchangeRatesUseCase
 
         self.action = { [weak self] action in
             guard let self = self else { return }
             switch action {
-            case .fetchRates(let base):
-                self.fetchRates(base: base)
+            case .fetchCurrencyItem(let base):
+                self.fetchCurrencyItem(base: base)
             case .filterRates(let searchText):
                 self.filterRates(with: searchText)
             case .toggleFavorite(let code):
@@ -78,20 +75,31 @@ final class ExchangeRateViewModel: ViewModelProtocol {
         }
     }
 
-    private func fetchRates(base: String) {
-        fetchExchangeRatesUseCase.execute(base: base) { [weak self] result in
+    private func fetchCurrencyItem(base: String) {
+        currencyItemUseCase.fetchCurrencyItem(base: base) { [weak self] result in
             DispatchQueue.main.async {
                 guard let self = self else { return }
                 switch result {
                 case .success(let items):
-                    let sorted = items.sorted { $0.currencyCode < $1.currencyCode }
+                    let updateRates = self.compareAndUpdateRates(apiItems: items)
+                    let sorted = updateRates.sorted { $0.currencyCode < $1.currencyCode }
                     self.allDisplayItems = sorted
                     self.state.currencyItems = self.applyFavoriteSorting(to: sorted)
                     self.state.errorMessage = nil
+                    
                 case .failure:
                     self.failureFetchState()
                 }
             }
+        }
+    }
+    
+    private func compareAndUpdateRates(apiItems: [CurrencyItem]) -> [CurrencyItem] {
+        do {
+          return  try cachedCurrencyUseCase.compareAndUpdateRates(currencyItems: apiItems)
+        } catch {
+            self.failureFetchState()
+            return apiItems
         }
     }
 

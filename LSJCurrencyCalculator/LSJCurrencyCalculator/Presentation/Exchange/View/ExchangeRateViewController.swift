@@ -41,7 +41,7 @@ final class ExchangeRateViewController: UIViewController {
         bindViewModel()
 
         // 데이터를 요청하는 action 전달
-        viewModel.action?(.fetchRates(base: "USD"))
+        viewModel.action?(.fetchCurrencyItem(base: "USD"))
         viewModel.action?(.saveLastViewItem)
     }
     

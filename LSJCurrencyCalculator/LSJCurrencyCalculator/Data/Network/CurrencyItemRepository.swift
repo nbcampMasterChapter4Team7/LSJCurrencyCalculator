@@ -9,9 +9,9 @@ import Foundation
 
 final class CurrencyItemRepository: CurrencyItemRepositoryProtocol {
 
-    private let apiClient: APIClient
+    private let apiClient: APIClientProtocol
 
-    init(apiClient: APIClient) {
+    init(apiClient: APIClientProtocol) {
         self.apiClient = apiClient
     }
 
