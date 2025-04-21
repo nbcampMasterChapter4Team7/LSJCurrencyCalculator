@@ -25,23 +25,23 @@ final class FavoriteCurrencyUseCase {
     func removeFavorite(currencyCode: String) throws {
         try repository.removeFavorite(currencyCode: currencyCode)
     }
+}
 
-    // 즐겨찾기 여부 확인
+// ViewModel에서 사용
+extension FavoriteCurrencyUseCase {
     func isFavorite(currencyCode: String) -> Bool {
         let favorites = (try? fetchFavorites()) ?? []
         return favorites.contains { $0.currencyCode == currencyCode }
     }
     
     func updateFavoriteState(currencyitems: [CurrencyItem]) -> [CurrencyItem] {
-        
         return currencyitems.map { item in
             var copy = item
             copy.isFavorite = isFavorite(currencyCode: item.currencyCode)
             return copy
         }
     }
- 
-    // 토글: 이미 즐겨찾기면 삭제, 아니면 추가
+
     func toggleFavorite(currencyCode: String) throws {
         if isFavorite(currencyCode: currencyCode) {
             try removeFavorite(currencyCode: currencyCode)
@@ -51,7 +51,6 @@ final class FavoriteCurrencyUseCase {
     }
     
     func applyFavoriteSorting(to items: [CurrencyItem]) -> [CurrencyItem] {
-
         return items.sorted {
             if isFavorite(currencyCode: $0.currencyCode) != isFavorite(currencyCode: $1.currencyCode) {
                 return isFavorite(currencyCode: $0.currencyCode)
@@ -59,6 +58,5 @@ final class FavoriteCurrencyUseCase {
             return $0.currencyCode < $1.currencyCode
         }
     }
-    
 }
 

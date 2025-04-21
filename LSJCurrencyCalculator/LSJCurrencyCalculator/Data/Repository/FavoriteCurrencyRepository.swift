@@ -18,7 +18,7 @@ final class FavoriteCurrencyRepository: FavoriteCurrencyRepositoryProtocol {
 
     func fetchAllFavorites() throws -> [FavoriteCurrency] {
         let context = persistentContainer.viewContext
-        let request = FavoriteCurrency.fetchRequest() // NSFetchRequest<FavoriteCurrency>
+        let request = FavoriteCurrency.fetchRequest()
         return try context.fetch(request)
     }
 

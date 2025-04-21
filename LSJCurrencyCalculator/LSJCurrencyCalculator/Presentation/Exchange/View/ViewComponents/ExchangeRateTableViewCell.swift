@@ -13,7 +13,11 @@ import Then
 
 final class ExchangeRateTableViewCell: UITableViewCell {
 
+    // MARK: - Properties
+    
     static let identifier = "ExchangeRateCell"
+    
+    // MARK: - UI Components
 
     private let currencyLabel = UILabel().then {
         $0.font = .systemFont(ofSize: 16, weight: .medium)
@@ -47,46 +51,28 @@ final class ExchangeRateTableViewCell: UITableViewCell {
         $0.spacing = 4
     }
 
-    // 즐겨찾기 버튼 클릭 시 외부에서 처리할 클로저
-    var favoriteButtonAction: (() -> Void)?
-
+    // MARK: - Initializer
+    
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         setStyle()
-        setupLayout()
+        setLayout()
         favoriteButton.addTarget(self, action: #selector(didTapFavorite), for: .touchUpInside)
     }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    // MARK: - Style
     
     private func setStyle() {
         contentView.backgroundColor = .cellBackground
     }
+    
+    // MARK: - Layout
 
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-
-    @objc private func didTapFavorite() {
-        favoriteButtonAction?()
-    }
-
-    // 즐겨찾기 상태에 따라 버튼 이미지 업데이트
-    func configure(with currency: String, rate: Double, direction: RateChangeDirection, isFavorite: Bool) {
-        currencyLabel.text = currency
-        countryLabel.text = CurrencyCountryMapper.countryName(for: currency)
-        rateLabel.text = String(format: "%.4f", rate)
-        switch direction {
-        case .up:
-            trendLabel.text = "🔼"
-        case .down:
-            trendLabel.text = "🔽"
-        case .none:
-            trendLabel.text = "―"
-        }
-        let imageName = isFavorite ? "star.fill" : "star"
-        favoriteButton.setImage(UIImage(systemName: imageName), for: .normal)
-    }
-
-    private func setupLayout() {
+    private func setLayout() {
         labelStackView.addArrangedSubviews(currencyLabel, countryLabel)
         contentView.addSubviews(labelStackView, rateLabel, trendLabel, favoriteButton)
 
@@ -115,5 +101,33 @@ final class ExchangeRateTableViewCell: UITableViewCell {
             make.width.height.equalTo(24)
         }
 
+    }
+
+    // MARK: Actions
+    // 즐겨찾기 버튼 클릭 시 외부에서 처리할 클로저
+    var favoriteButtonAction: (() -> Void)?
+
+    // MARK: - @objc Methods
+    
+    @objc private func didTapFavorite() {
+        favoriteButtonAction?()
+    }
+    
+    // MARK: - Configure
+    /// 즐겨찾기 상태에 따라 버튼 이미지 업데이트
+    func configure(with currency: String, rate: Double, direction: RateChangeDirection, isFavorite: Bool) {
+        currencyLabel.text = currency
+        countryLabel.text = CurrencyCountryMapper.countryName(for: currency)
+        rateLabel.text = String(format: "%.4f", rate)
+        switch direction {
+        case .up:
+            trendLabel.text = "🔼"
+        case .down:
+            trendLabel.text = "🔽"
+        case .none:
+            trendLabel.text = "―"
+        }
+        let imageName = isFavorite ? "star.fill" : "star"
+        favoriteButton.setImage(UIImage(systemName: imageName), for: .normal)
     }
 }

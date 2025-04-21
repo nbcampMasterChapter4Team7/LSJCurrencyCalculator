@@ -10,15 +10,22 @@ import SnapKit
 import Then
 
 final class ExchangeRateViewController: UIViewController {
+    
+    // MARK: - Properties
 
     private let viewModel: ExchangeRateViewModel
     private let lastViewItemUseCase: LastViewItemUseCase
+    
+    // MARK: - UI Components
+    
     private let tableView = UITableView()
     private let searchBar = UISearchBar().then {
         $0.placeholder = "통화 검색"
 //        $0.backgroundImage = UIImage() // 검색바 위/아래 테두리 제거
         $0.searchBarStyle = .minimal
     }
+    
+    // MARK: - Initializer
 
     init(
         viewModel: ExchangeRateViewModel,
@@ -33,30 +40,39 @@ final class ExchangeRateViewController: UIViewController {
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
+    
+    // MARK: - LifeCycle
+    
+    // MARK: - LifeCycle - viewDidLoad
 
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        setStyles()
+        setStyle()
         setLayout()
         setUIComponents()
         bindViewModel()
 
-        // 데이터를 요청하는 action 전달
         viewModel.action?(.fetchCurrencyItem(base: "USD"))
         viewModel.action?(.saveLastViewItem)
     }
+    
+    // MARK: - LifeCycle - viewDidAppear
 
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         viewModel.action?(.saveLastViewItem)
     }
+    
+    // MARK: - Style
 
-    private func setStyles() {
+    private func setStyle() {
         view.backgroundColor = .background
         navigationController?.navigationBar.prefersLargeTitles = true
         navigationItem.title = "환율 목록"
     }
+    
+    // MARK: - Layout
 
     private func setLayout() {
         view.addSubviews(searchBar, tableView)
@@ -69,12 +85,16 @@ final class ExchangeRateViewController: UIViewController {
             make.leading.trailing.bottom.equalTo(view.safeAreaLayoutGuide)
         }
     }
-
+    
+    // MARK: - Methods
+    
     private func setUIComponents() {
         setSearchBar()
         setTableView()
     }
 
+    // MARK: - Methods - setDelegate, dataSource etc.
+    
     private func setSearchBar() {
         searchBar.delegate = self
     }
@@ -86,6 +106,8 @@ final class ExchangeRateViewController: UIViewController {
         tableView.rowHeight = 60
         tableView.separatorInset = .init(top: 0, left: 16, bottom: 0, right: 16)
     }
+    
+    // MARK: - Methods - bindViewModel
 
     private func bindViewModel() {
         viewModel.onStateChange = { [weak self] state in
@@ -108,12 +130,16 @@ final class ExchangeRateViewController: UIViewController {
         }
     }
 
+    // MARK: - Methods - showAlerts
+    
     private func showAlert(message: String) {
         let alert = UIAlertController(title: "오류", message: message, preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "확인", style: .default))
         present(alert, animated: true)
     }
 }
+
+// MARK: - UITableView Extension
 
 extension ExchangeRateViewController: UITableViewDataSource, UITableViewDelegate {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -147,6 +173,8 @@ extension ExchangeRateViewController: UITableViewDataSource, UITableViewDelegate
         navigationController?.pushViewController(calculatorViewController, animated: true)
     }
 }
+
+// MARK: - UISearchBar Extension
 
 extension ExchangeRateViewController: UISearchBarDelegate {
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {

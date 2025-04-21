@@ -69,6 +69,15 @@ final class ExchangeRateViewModel: ViewModelProtocol {
         }
     }
 
+    // MARK: - Methods
+    
+    // MARK: - Methods - fetchCurrencyItem
+    
+    /// Description
+    /// - Parameter base: currencyCode
+    /// 1. API로부터 데이터 fetch
+    /// 2. cach data와 비교후 이동률 표시
+    /// 3. 즐겨찾기 update
     private func fetchCurrencyItem(base: String) {
         currencyItemUseCase.fetchCurrencyItem(base: base) { [weak self] result in
             DispatchQueue.main.async {
@@ -88,7 +97,8 @@ final class ExchangeRateViewModel: ViewModelProtocol {
             }
         }
     }
-
+    
+    /// 2. cach data와 비교후 이동률 표시
     private func compareAndUpdateRates(apiItems: [CurrencyItem]) -> [CurrencyItem] {
         do {
             return try cachedCurrencyUseCase.compareAndUpdateRates(currencyItems: apiItems)
@@ -97,30 +107,19 @@ final class ExchangeRateViewModel: ViewModelProtocol {
             return apiItems
         }
     }
-
+    
+    /// 실패시 데이터 처리
     private func failureFetchState() {
         self.allDisplayItems = []
         self.state.currencyItems = []
         self.state.errorMessage = "데이터를 불러올 수 없습니다."
     }
 
-
-    private func saveLastViewItem() {
-        let lastViewItem = LastViewItem(screenType: .exchange, currencyCode: nil)
-        try? self.lastViewItemUseCase.saveLastViewItem(lastViewItem: lastViewItem)
-    }
-
-    private func toggleFavorite(for currencyCode: String) {
-        do {
-            try favoriteCurrencyUseCase.toggleFavorite(currencyCode: currencyCode)
-        } catch {
-            state.errorMessage = "즐겨찾기 변경에 실패했습니다."
-        }
-        allDisplayItems = favoriteCurrencyUseCase.updateFavoriteState(currencyitems: allDisplayItems)
-        // 즐겨찾기 상태 재정렬
-        state.currencyItems = favoriteCurrencyUseCase.applyFavoriteSorting(to: allDisplayItems)
-    }
-
+    // MARK: - Methods - filterRates
+    
+    /// Description
+    /// - Parameter searchText: 검색바 입력 데이터
+    /// SearchBar에 입력된 데이터로 table cell에 보일 데이터 (currencyItems) 정렬
     private func filterRates(with searchText: String) {
         let trim = searchText.trimmingCharacters(in: .whitespacesAndNewlines)
         let filtered: [CurrencyItem]
@@ -135,5 +134,31 @@ final class ExchangeRateViewModel: ViewModelProtocol {
             }
         }
         state.currencyItems = favoriteCurrencyUseCase.applyFavoriteSorting(to: filtered)
+    }
+    
+    // MARK: - Methods - toggleFavorite
+    
+    /// Description
+    /// - Parameter currencyCode: currencyCode
+    /// 1.즐겨찾기 상태 저장
+    /// 2.cell ui 업데이트
+    /// 3.정렬
+    private func toggleFavorite(for currencyCode: String) {
+        do {
+            try favoriteCurrencyUseCase.toggleFavorite(currencyCode: currencyCode)
+        } catch {
+            state.errorMessage = "즐겨찾기 변경에 실패했습니다."
+        }
+        allDisplayItems = favoriteCurrencyUseCase.updateFavoriteState(currencyitems: allDisplayItems)
+        // 즐겨찾기 상태 재정렬
+        state.currencyItems = favoriteCurrencyUseCase.applyFavoriteSorting(to: allDisplayItems)
+    }
+    
+    // MARK: - Methods - saveLastViewItem
+    
+    /// 마지막으로 본 화면 저장
+    private func saveLastViewItem() {
+        let lastViewItem = LastViewItem(screenType: .exchange, currencyCode: nil)
+        try? self.lastViewItemUseCase.saveLastViewItem(lastViewItem: lastViewItem)
     }
 }

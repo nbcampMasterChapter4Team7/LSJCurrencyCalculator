@@ -11,8 +11,12 @@ import SnapKit
 import Then
 
 final class CalculatorViewController: UIViewController {
+    
+    // MARK: - Properties
 
     private let viewModel: CalculatorViewModel
+    
+    // MARK: - UI Components
 
     private let labelStackView = UIStackView().then {
         $0.axis = .vertical
@@ -53,6 +57,8 @@ final class CalculatorViewController: UIViewController {
         $0.numberOfLines = 0
     }
 
+    // MARK: - Initializer
+    
     init(viewModel: CalculatorViewModel) {
         self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
@@ -62,10 +68,14 @@ final class CalculatorViewController: UIViewController {
         fatalError("init(coder:) has not been implemented")
     }
 
+    // MARK: - LifeCycle
+    
+    // MARK: - LifeCycle - viewDidLoad
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        setStyles()
+        setStyle()
         setLayout()
         configure()
         bindViewModel()
@@ -74,12 +84,16 @@ final class CalculatorViewController: UIViewController {
         convertButton.addTarget(self, action: #selector(convertButtonTapped), for: .touchUpInside)
         viewModel.action?(.saveLastViewItem)
     }
+    
+    // MARK: - Style
 
-    private func setStyles() {
+    private func setStyle() {
         view.backgroundColor = .background
         navigationItem.title = "환율 계산기"
         navigationController?.navigationBar.prefersLargeTitles = true
     }
+    
+    // MARK: - Layout
 
     private func setLayout() {
         labelStackView.addArrangedSubviews(currencyLabel, countryLabel)
@@ -109,15 +123,20 @@ final class CalculatorViewController: UIViewController {
         }
     }
 
-    private func configure() {
-        let exchangeRate = viewModel.selectedCurrencyItem
-        currencyLabel.text = exchangeRate.currencyCode
-        countryLabel.text = CurrencyCountryMapper.countryName(for: exchangeRate.currencyCode)
+    // MARK: - @objc Methods
+    
+    @objc private func convertButtonTapped() {
+        // 텍스트필드의 값을 가져와 Action 전달
+        guard let input = amountTextField.text else { return }
+        viewModel.action?(.convertCurrency(input))
     }
 
+    // MARK: - Methods
+    
+    // MARK: - Methods - bindViewModel
+    /// 상태 업데이트에 따라 결과 출력, 에러가 있으면 Alert 처리
     private func bindViewModel() {
         viewModel.onStateChange = { [weak self] state in
-            // 상태 업데이트에 따라 결과 출력, 에러가 있으면 Alert 처리
             DispatchQueue.main.async {
                 if let error = state.errorMessage {
                     self?.showAlert(message: error)
@@ -129,15 +148,19 @@ final class CalculatorViewController: UIViewController {
         }
     }
 
-    @objc private func convertButtonTapped() {
-        // 텍스트필드의 값을 가져와 Action 전달
-        guard let input = amountTextField.text else { return }
-        viewModel.action?(.convertCurrency(input))
-    }
+    // MARK: - Methods - showAlert
 
     private func showAlert(message: String) {
         let alert = UIAlertController(title: "오류", message: message, preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "확인", style: .default))
         present(alert, animated: true)
+    }
+    
+    // MARK: - Configure
+    
+    private func configure() {
+        let exchangeRate = viewModel.selectedCurrencyItem
+        currencyLabel.text = exchangeRate.currencyCode
+        countryLabel.text = CurrencyCountryMapper.countryName(for: exchangeRate.currencyCode)
     }
 }

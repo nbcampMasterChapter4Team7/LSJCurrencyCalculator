@@ -35,7 +35,5 @@ final class CachedCurrencyUseCase {
     func compareAndUpdateRates(currencyItems: [CurrencyItem]) throws -> [CurrencyItem] {
         return try repository.compareAndUpdateRates(currencyItems: currencyItems)
     }
-    
-    
 }
 

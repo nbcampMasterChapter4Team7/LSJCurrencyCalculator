@@ -32,7 +32,7 @@ final class CachedCurrencyRepository: CachedCurrencyRepositoryProtocol {
             return true
         }
 
-        print("isNeedCompare :  \(firstItem.timeUnix) : \(timeUnix) --> \(firstItem.timeUnix != timeUnix)")
+        print("[DEBUG] : isNeedCompare :  \(firstItem.timeUnix) : \(timeUnix) --> \(firstItem.timeUnix != timeUnix)")
 
         return firstItem.timeUnix != timeUnix
     }
@@ -46,7 +46,7 @@ final class CachedCurrencyRepository: CachedCurrencyRepositoryProtocol {
         if let target = result.first {
             return target
         }
-        print("no fetch cache data")
+        print("[DEBUG] : no fetch cache data")
         return nil
     }
 
@@ -72,11 +72,11 @@ final class CachedCurrencyRepository: CachedCurrencyRepositoryProtocol {
         let entity: CachedCurrency
         if let e = existing {
             entity = e
-            print("TT : existing")
+            print("[DEBUG] : existing cache")
         } else {
             entity = CachedCurrency(context: context)
             entity.currencyCode = currencyCode
-            print("TT : new save")
+            print("[DEBUG] : new save cache")
         }
         entity.rate = rate
         entity.timeUnix = Int64(timeUnix)
