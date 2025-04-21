@@ -64,7 +64,8 @@ final class CalculatorViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        navigationItem.title = "환율 계산기"
+        
+        
         setStyles()
         setLayout()
         configure()
@@ -77,6 +78,8 @@ final class CalculatorViewController: UIViewController {
 
     private func setStyles() {
         view.backgroundColor = .background
+        navigationItem.title = "환율 계산기"
+        navigationController?.navigationBar.prefersLargeTitles = true
     }
 
     private func setLayout() {

@@ -38,7 +38,6 @@ final class CalculatorViewModel: ViewModelProtocol {
     
     // 선택한 환율 정보를 저장합니다.
     let selectedCurrencyItem: CurrencyItem
-    
     private let lastViewItemUseCase: LastViewItemUseCase
 
     // 초기화 시 선택한 환율 정보를 받습니다.

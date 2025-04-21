@@ -20,12 +20,13 @@ final class ExchangeRateViewController: UIViewController {
     }
 
     init(
-      viewModel: ExchangeRateViewModel,
-      lastViewItemUseCase: LastViewItemUseCase
+        viewModel: ExchangeRateViewModel,
+        lastViewItemUseCase: LastViewItemUseCase
     ) {
-      self.viewModel = viewModel
-      self.lastViewItemUseCase = lastViewItemUseCase
-      super.init(nibName: nil, bundle: nil)
+        self.viewModel = viewModel
+        self.lastViewItemUseCase = lastViewItemUseCase
+        super.init(nibName: nil, bundle: nil)
+        self.navigationItem.backButtonTitle = "환율 목록"
     }
 
     required init?(coder: NSCoder) {
@@ -34,7 +35,7 @@ final class ExchangeRateViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+
         setStyles()
         setLayout()
         setUIComponents()
@@ -44,7 +45,7 @@ final class ExchangeRateViewController: UIViewController {
         viewModel.action?(.fetchCurrencyItem(base: "USD"))
         viewModel.action?(.saveLastViewItem)
     }
-    
+
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         viewModel.action?(.saveLastViewItem)
@@ -52,6 +53,8 @@ final class ExchangeRateViewController: UIViewController {
 
     private func setStyles() {
         view.backgroundColor = .background
+        navigationController?.navigationBar.prefersLargeTitles = true
+        navigationItem.title = "환율 목록"
     }
 
     private func setLayout() {
