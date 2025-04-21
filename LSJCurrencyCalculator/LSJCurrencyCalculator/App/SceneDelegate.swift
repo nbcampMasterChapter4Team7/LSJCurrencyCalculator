@@ -19,18 +19,23 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         // AppDelegatea 내의 Coredata Container 설정
         let appDelegate = UIApplication.shared.delegate as! AppDelegate
         let container = appDelegate.persistentContainer
-
+        
+        // MARK: TEST
+        /// true / false로 이전 api data 불러오기
+        let useFileMock = false
+        let testCurrencyRepo: CurrencyItemRepositoryProtocol = useFileMock ? FileCurrencyItemRepository(filename: "sample.json") : RepositoryManager().makeRepositories(using: container).currencyRepo
+        
         // Data Layer
         let repositorys = RepositoryManager().makeRepositories(using: container)
 
         // Domain Layer
         let useCases = UseCaseManager().makeUseCases(
-            currencyRepo: repositorys.currencyRepo,
+            currencyRepo: /*repositorys.currencyRepo,*/ testCurrencyRepo,
             favoriteRepo: repositorys.favoriteRepo,
             cacheRepo: repositorys.cacheRepo,
             lastViewRepo: repositorys.lastViewRepo
         )
-        
+
         // Presentation Layer
         let exchangeRateViewModel = ExchangeRateViewModel(
             currencyItemUseCase: useCases.currencyUC,
@@ -38,12 +43,12 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             cachedCurrencyUseCase: useCases.cacheUC,
             lastViewItemUseCase: useCases.lastViewUC
         )
-        
+
         let exchangeRateViewController = ExchangeRateViewController(
             viewModel: exchangeRateViewModel,
-            lastViewItemUseCase:  useCases.lastViewUC
+            lastViewItemUseCase: useCases.lastViewUC
         )
-        
+
         let navigationController = UINavigationController(rootViewController: exchangeRateViewController)
 
         // Restore Last Viewed Screen
