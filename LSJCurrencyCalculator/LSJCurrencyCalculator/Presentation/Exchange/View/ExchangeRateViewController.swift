@@ -16,7 +16,8 @@ final class ExchangeRateViewController: UIViewController {
     private let tableView = UITableView()
     private let searchBar = UISearchBar().then {
         $0.placeholder = "통화 검색"
-        $0.backgroundImage = UIImage() // 검색바 위/아래 테두리 제거
+//        $0.backgroundImage = UIImage() // 검색바 위/아래 테두리 제거
+        $0.searchBarStyle = .minimal
     }
 
     init(
@@ -129,7 +130,7 @@ extension ExchangeRateViewController: UITableViewDataSource, UITableViewDelegate
         let code = item.currencyCode
         let rate = item.rate
         let direction = item.change
-        let isFavorite = viewModel.isFavorite(currencyCode: code)
+        let isFavorite = item.isFavorite
         cell.configure(with: code, rate: rate, direction: direction, isFavorite: isFavorite)
         cell.favoriteButtonAction = { [weak self] in
             self?.viewModel.action?(.toggleFavorite(currencyCode: code))
@@ -150,13 +151,6 @@ extension ExchangeRateViewController: UITableViewDataSource, UITableViewDelegate
 extension ExchangeRateViewController: UISearchBarDelegate {
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
         // 뷰모델에 검색어 전달하여 필터링 실행
-        viewModel.filterRates(with: searchText)
-    }
-
-    // 검색 취소시 전체 목록 노출 (선택사항)
-    func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
-        searchBar.text = ""
-        viewModel.filterRates(with: "")
-        searchBar.resignFirstResponder()
+        viewModel.action?(.filterRates(searchText: searchText))
     }
 }

@@ -97,9 +97,11 @@ final class CachedCurrencyRepository: CachedCurrencyRepositoryProtocol {
                     newCurrencyItem: item
                 )
                 // 캐시에 저장
-                try saveCurrency(currencyCode: item.currencyCode,
-                                               rate: item.rate,
-                                               timeUnix: currentTime, change: direction.rawValue
+                try saveCurrency(
+                    currencyCode: item.currencyCode,
+                    rate: item.rate,
+                    timeUnix: currentTime,
+                    change: direction.rawValue
                 )
                 // Domain 엔티티 생성
                 result.append(
@@ -108,7 +110,7 @@ final class CachedCurrencyRepository: CachedCurrencyRepositoryProtocol {
                         rate: item.rate,
                         timeUnix: currentTime,
                         change: direction,
-                        isFavorite: false
+                        isFavorite: item.isFavorite
                     )
                 )
             }

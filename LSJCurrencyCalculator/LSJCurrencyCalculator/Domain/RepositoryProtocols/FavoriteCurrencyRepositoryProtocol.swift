@@ -11,6 +11,5 @@ protocol FavoriteCurrencyRepositoryProtocol {
     func fetchAllFavorites() throws -> [FavoriteCurrency]
     func addFavorite(currencyCode: String) throws
     func removeFavorite(currencyCode: String) throws
-    func updateFavorite(currencyCode: String, isFavorite: Bool) throws
 }
 

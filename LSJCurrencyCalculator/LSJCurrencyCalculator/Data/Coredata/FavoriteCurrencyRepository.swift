@@ -41,17 +41,5 @@ final class FavoriteCurrencyRepository: FavoriteCurrencyRepositoryProtocol {
         }
         try context.save()
     }
-
-    func updateFavorite(currencyCode: String, isFavorite: Bool) throws {
-        let context = persistentContainer.viewContext
-        let request = FavoriteCurrency.fetchRequest()
-        request.predicate = NSPredicate(format: "currencyCode == %@", currencyCode)
-        let results = try context.fetch(request)
-        
-        if let target = results.first {
-            target.isFavorite = isFavorite
-            try context.save()
-        }
-    }
 }
 
