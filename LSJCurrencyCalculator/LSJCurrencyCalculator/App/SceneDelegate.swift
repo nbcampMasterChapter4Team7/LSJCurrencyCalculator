@@ -21,65 +21,37 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         let container = appDelegate.persistentContainer
 
         // Data Layer
-        let apiClient = APIClient()
-        
-        // MARK: TEST
-//        let useFileMock = true
-//        let repository: CurrencyItemRepositoryProtocol = useFileMock
-//            ? FileCurrencyItemRepository(filename: "sample.json")
-//        : CurrencyItemRepository(apiClient: apiClient)
-        
-        let repository: CurrencyItemRepositoryProtocol = CurrencyItemRepository(apiClient: apiClient)
-
-        let favoriteCurrencyRepository = FavoriteCurrencyRepository(persistentContainer: container)
-        let cachedCurrencyRepository = CachedCurrencyRepository(persistentContainer: container)
-        let lastViewRepository = LastViewRepository(persistentContainer: container)
+        let repositorys = RepositoryManager().makeRepositories(using: container)
 
         // Domain Layer
-        let currencyItemUseCase = CurrencyItemUseCase(repository: repository)
-        let favoriteCurrencyUseCase = FavoriteCurrencyUseCase(repository: favoriteCurrencyRepository)
-        let cachedCurrencyUseCase = CachedCurrencyUseCase(repository: cachedCurrencyRepository)
-        let lastViewItemUseCase = LastViewItemUseCase(repository: lastViewRepository)
-
-        // Presentation Layer
-        let exchangeRateViewModel = ExchangeRateViewModel(currencyItemUseCase: currencyItemUseCase, favoriteCurrencyUseCase: favoriteCurrencyUseCase, cachedCurrencyUseCase: cachedCurrencyUseCase, lastViewItemUseCase: lastViewItemUseCase)
-        let exchangeRateViewController = ExchangeRateViewController(viewModel: exchangeRateViewModel, lastViewItemUseCase: lastViewItemUseCase)
-        exchangeRateViewController.navigationItem.title = "환율 목록"
-        exchangeRateViewController.navigationItem.backButtonTitle = "환율 목록"
-
-        // UINavigationController 세팅 (Large title 활성화)
+        let useCases = UseCaseManager().makeUseCases(
+            currencyRepo: repositorys.currencyRepo,
+            favoriteRepo: repositorys.favoriteRepo,
+            cacheRepo: repositorys.cacheRepo,
+            lastViewRepo: repositorys.lastViewRepo
+        )
+        
+        let exchangeRateViewModel = ExchangeRateViewModel(
+            currencyItemUseCase: useCases.currencyUC,
+            favoriteCurrencyUseCase: useCases.favoriteUC,
+            cachedCurrencyUseCase: useCases.cacheUC,
+            lastViewItemUseCase: useCases.lastViewUC
+        )
+        
+        let exchangeRateViewController = ExchangeRateViewController(
+            viewModel: exchangeRateViewModel,
+            lastViewItemUseCase:  useCases.lastViewUC
+        )
+        
         let navigationController = UINavigationController(rootViewController: exchangeRateViewController)
-        navigationController.navigationBar.prefersLargeTitles = true
 
         // Restore Last Viewed Screen
-        if let last = try? lastViewItemUseCase.loadLastViewItem() {
-            switch ScreenType(rawValue: last.screenType) {
-            case .calculator:
-                if let code = last.currencyCode {
-                    let cachedCurrencys = try? cachedCurrencyUseCase.fetchAllCachedCurrency()
-                    let timeUnix = Int(cachedCurrencys?.first?.timeUnix ?? 0)
-
-                    let fetchCacheCurrency = try? cachedCurrencyUseCase.fetchCachedCurrency(currencyCode: code)
-
-                    let selectedCurrencyItem = CurrencyItem(
-                        currencyCode: fetchCacheCurrency?.currencyCode ?? "",
-                        rate: fetchCacheCurrency?.rate ?? 0,
-                        timeUnix: timeUnix,
-                        change: RateChangeDirection(rawValue: fetchCacheCurrency!.change) ?? .none,
-                        isFavorite: false
-                    )
-
-                    let calculatorViewModel = CalculatorViewModel(selectedCurrencyItem: selectedCurrencyItem, lastViewItemUseCase: lastViewItemUseCase)
-                    let calculatorViewController = CalculatorViewController(viewModel: calculatorViewModel)
-                    navigationController.pushViewController(calculatorViewController, animated: true)
-                }
-            default:
-                break
-            }
-        } else {
-            print("최근 페이지 추적 실패")
-        }
-
+        NavigationManager().restoreLastViewedScreen(
+            on: navigationController,
+            cacheUseCase: useCases.cacheUC,
+            lastViewUseCase: useCases.lastViewUC,
+            favoriteUseCase: useCases.favoriteUC
+        )
 
         // UIWindow 세팅
         window = UIWindow(windowScene: windowScene)
