@@ -31,6 +31,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             lastViewRepo: repositorys.lastViewRepo
         )
         
+        // Presentation Layer
         let exchangeRateViewModel = ExchangeRateViewModel(
             currencyItemUseCase: useCases.currencyUC,
             favoriteCurrencyUseCase: useCases.favoriteUC,
