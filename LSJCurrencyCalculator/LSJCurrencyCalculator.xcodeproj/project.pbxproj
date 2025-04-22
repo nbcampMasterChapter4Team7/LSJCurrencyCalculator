@@ -12,8 +12,19 @@
 		86115E1F2DAD092300FEAA17 /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = 86115E1E2DAD092300FEAA17 /* Alamofire */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXContainerItemProxy section */
+		86CD04ED2DB783CA00F19CF8 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 86115DF72DAD08DE00FEAA17 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 86115DFE2DAD08DE00FEAA17;
+			remoteInfo = LSJCurrencyCalculator;
+		};
+/* End PBXContainerItemProxy section */
+
 /* Begin PBXFileReference section */
 		86115DFF2DAD08DE00FEAA17 /* LSJCurrencyCalculator.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LSJCurrencyCalculator.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		86CD04E92DB783CA00F19CF8 /* LSJCurrencyCalculatorTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = LSJCurrencyCalculatorTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -35,6 +46,11 @@
 			path = LSJCurrencyCalculator;
 			sourceTree = "<group>";
 		};
+		86CD04EA2DB783CA00F19CF8 /* LSJCurrencyCalculatorTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = LSJCurrencyCalculatorTests;
+			sourceTree = "<group>";
+		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -48,6 +64,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		86CD04E62DB783CA00F19CF8 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -55,6 +78,7 @@
 			isa = PBXGroup;
 			children = (
 				86115E012DAD08DE00FEAA17 /* LSJCurrencyCalculator */,
+				86CD04EA2DB783CA00F19CF8 /* LSJCurrencyCalculatorTests */,
 				86115E002DAD08DE00FEAA17 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -63,6 +87,7 @@
 			isa = PBXGroup;
 			children = (
 				86115DFF2DAD08DE00FEAA17 /* LSJCurrencyCalculator.app */,
+				86CD04E92DB783CA00F19CF8 /* LSJCurrencyCalculatorTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -95,6 +120,29 @@
 			productReference = 86115DFF2DAD08DE00FEAA17 /* LSJCurrencyCalculator.app */;
 			productType = "com.apple.product-type.application";
 		};
+		86CD04E82DB783CA00F19CF8 /* LSJCurrencyCalculatorTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 86CD04F12DB783CA00F19CF8 /* Build configuration list for PBXNativeTarget "LSJCurrencyCalculatorTests" */;
+			buildPhases = (
+				86CD04E52DB783CA00F19CF8 /* Sources */,
+				86CD04E62DB783CA00F19CF8 /* Frameworks */,
+				86CD04E72DB783CA00F19CF8 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				86CD04EE2DB783CA00F19CF8 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				86CD04EA2DB783CA00F19CF8 /* LSJCurrencyCalculatorTests */,
+			);
+			name = LSJCurrencyCalculatorTests;
+			packageProductDependencies = (
+			);
+			productName = LSJCurrencyCalculatorTests;
+			productReference = 86CD04E92DB783CA00F19CF8 /* LSJCurrencyCalculatorTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -107,6 +155,10 @@
 				TargetAttributes = {
 					86115DFE2DAD08DE00FEAA17 = {
 						CreatedOnToolsVersion = 16.3;
+					};
+					86CD04E82DB783CA00F19CF8 = {
+						CreatedOnToolsVersion = 16.3;
+						TestTargetID = 86115DFE2DAD08DE00FEAA17;
 					};
 				};
 			};
@@ -130,12 +182,20 @@
 			projectRoot = "";
 			targets = (
 				86115DFE2DAD08DE00FEAA17 /* LSJCurrencyCalculator */,
+				86CD04E82DB783CA00F19CF8 /* LSJCurrencyCalculatorTests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
 		86115DFD2DAD08DE00FEAA17 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		86CD04E72DB783CA00F19CF8 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -152,7 +212,22 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		86CD04E52DB783CA00F19CF8 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		86CD04EE2DB783CA00F19CF8 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 86115DFE2DAD08DE00FEAA17 /* LSJCurrencyCalculator */;
+			targetProxy = 86CD04ED2DB783CA00F19CF8 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		86115E132DAD08DF00FEAA17 /* Debug */ = {
@@ -330,6 +405,42 @@
 			};
 			name = Release;
 		};
+		86CD04EF2DB783CA00F19CF8 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = Y333NVBXPT;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.SeJunLee.LSJCurrencyCalculatorTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/LSJCurrencyCalculator.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/LSJCurrencyCalculator";
+			};
+			name = Debug;
+		};
+		86CD04F02DB783CA00F19CF8 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = Y333NVBXPT;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.SeJunLee.LSJCurrencyCalculatorTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/LSJCurrencyCalculator.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/LSJCurrencyCalculator";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -347,6 +458,15 @@
 			buildConfigurations = (
 				86115E132DAD08DF00FEAA17 /* Debug */,
 				86115E142DAD08DF00FEAA17 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		86CD04F12DB783CA00F19CF8 /* Build configuration list for PBXNativeTarget "LSJCurrencyCalculatorTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				86CD04EF2DB783CA00F19CF8 /* Debug */,
+				86CD04F02DB783CA00F19CF8 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
