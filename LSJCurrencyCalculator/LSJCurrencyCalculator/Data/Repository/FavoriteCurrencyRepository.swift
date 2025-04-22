@@ -24,9 +24,17 @@ final class FavoriteCurrencyRepository: FavoriteCurrencyRepositoryProtocol {
 
     func addFavorite(currencyCode: String) throws {
         let context = persistentContainer.viewContext
-        let favorite = FavoriteCurrency(context: context)
-        favorite.currencyCode = currencyCode
-        favorite.isFavorite = true
+        let request = FavoriteCurrency.fetchRequest()
+        request.predicate = NSPredicate(format: "currencyCode == %@", currencyCode)
+        let existing = try context.fetch(request).first
+        let entity: FavoriteCurrency
+        if let e = existing {
+            entity = e
+        } else {
+            entity = FavoriteCurrency(context: context)
+            entity.currencyCode = currencyCode
+            entity.isFavorite = true
+        }
         try context.save()
     }
 

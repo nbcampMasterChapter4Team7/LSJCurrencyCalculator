@@ -2,7 +2,7 @@
 //  FavoriteCurrency+CoreDataProperties.swift
 //  LSJCurrencyCalculator
 //
-//  Created by yimkeul on 4/17/25.
+//  Created by yimkeul on 4/22/25.
 //
 //
 
