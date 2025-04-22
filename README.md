@@ -121,5 +121,4 @@ LSJCurrencyCalculator
 
 [Task 3 : Clean Architecture + MVVM 패턴 적용](https://github.com/nbcampMasterChapter4Team7/LSJCurrencyCalculator/issues/16)
 
-
-
+[Task 4 : XCTest Unit Test 진행](https://github.com/nbcampMasterChapter4Team7/LSJCurrencyCalculator/issues/17)
