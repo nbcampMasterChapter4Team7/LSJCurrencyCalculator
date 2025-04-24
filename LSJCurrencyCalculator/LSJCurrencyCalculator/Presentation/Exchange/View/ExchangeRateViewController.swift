@@ -53,8 +53,13 @@ final class ExchangeRateViewController: UIViewController {
         setUIComponents()
         bindViewModel()
 
+    }
+    
+    // MARK: - LifeCycle - viewWillAppear
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
         viewModel.action?(.fetchCurrencyItem(base: "USD"))
-        viewModel.action?(.saveLastViewItem)
     }
     
     // MARK: - LifeCycle - viewDidAppear
@@ -63,6 +68,7 @@ final class ExchangeRateViewController: UIViewController {
         super.viewDidAppear(animated)
         viewModel.action?(.saveLastViewItem)
     }
+    
     
     // MARK: - Style
 
